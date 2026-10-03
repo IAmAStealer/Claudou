@@ -40,7 +40,7 @@ Claude Code features you haven't tried, then everyday tricks. It speaks English 
 | `/claudou stats` | form, level, counters and achievements |
 | `/claudou pets` | the forms your crab reached |
 | `/claudou swap <form>` | show another form you reached, by number or name (`swap` alone: the newest) |
-| `/claudou here`, `/claudou hide` | show it, hide it |
+| `/claudou on`, `/claudou off` | show it, hide it (also `here`, `hide`) |
 
 To update: `/plugin marketplace update claudou`, then `/plugin update claudou@claudou`.
 

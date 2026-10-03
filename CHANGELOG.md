@@ -3,6 +3,10 @@
 Every release has a section here, written for players. CI refuses to tag a release without one
 (`python3 tools/changelog.py v1.2.3` prints the section it will publish).
 
+## v0.1.3 — 2026-10-04
+
+- `/claudou on` and `/claudou off` show and hide your crab, as in Bashou.
+
 ## v0.1.2 — 2026-10-04
 
 - No more side pane: your crab sits on the right, just above the prompt, and takes no room from your work.

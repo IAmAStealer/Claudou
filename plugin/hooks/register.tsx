@@ -140,7 +140,7 @@ export const register: Register = (on, options) => {
     const word = e.args.trim().toLowerCase()
     const p = await read($, progress)
     if (word === '') return { text: await show($, await read($, hidden)) }
-    if (word === 'here' || word === 'show') return { text: await show($, true) }
+    if (word === 'on' || word === 'here' || word === 'show') return { text: await show($, true) }
     if (word === 'hide' || word === 'off') return { text: await show($, false) }
     if (word === 'hint') return { text: hint(p) }
     if (word === 'stats') return { text: stats(p) }

@@ -4,8 +4,8 @@ export type Language = (typeof LANGUAGES)[number]
 
 export const MESSAGES = {
   commandHelp: {
-    en: 'Your crab: show or hide it, or ask hint, talk, stats, pets, swap, help',
-    fr: 'Ton crabe : l\'afficher ou le cacher, ou demander hint, talk, stats, pets, swap, help',
+    en: 'Your crab: show or hide it, or ask on, off, hint, talk, stats, pets, swap, help',
+    fr: 'Ton crabe : l\'afficher ou le cacher, ou demander on, off, hint, talk, stats, pets, swap, help',
   },
   help: {
     en: [
@@ -15,8 +15,8 @@ export const MESSAGES = {
       '/claudou stats: level, form, counters and achievements',
       '/claudou pets: the forms your crab reached',
       '/claudou swap <form>: show another form you reached (swap alone goes back to the newest)',
-      '/claudou here: show your crab',
-      '/claudou hide: hide it',
+      '/claudou on (or here): show your crab',
+      '/claudou off (or hide): hide it',
     ].join('\n'),
     fr: [
       '/claudou : afficher ou cacher ton crabe',
@@ -25,8 +25,8 @@ export const MESSAGES = {
       '/claudou stats : niveau, forme, compteurs et succès',
       '/claudou pets : les formes que ton crabe a atteintes',
       '/claudou swap <forme> : montrer une autre forme atteinte (swap seul revient à la plus récente)',
-      '/claudou here : afficher ton crabe',
-      '/claudou hide : le cacher',
+      '/claudou on (ou here) : afficher ton crabe',
+      '/claudou off (ou hide) : le cacher',
     ].join('\n'),
   },
   pets: { en: 'Forms reached ({n}/{max}):', fr: 'Formes atteintes ({n}/{max}) :' },
