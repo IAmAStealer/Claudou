@@ -3,6 +3,13 @@
 Every release has a section here, written for players. CI refuses to tag a release without one
 (`python3 tools/changelog.py v1.2.3` prints the section it will publish).
 
+## v0.1.2 — 2026-10-04
+
+- No more side pane: your crab sits on the right, just above the prompt, and takes no room from your work.
+- Now and then it says a tip in a speech bubble: the features you haven't tried, then Claude Code tricks.
+- New commands: `/claudou hint`, `talk`, `stats`, `pets`, `swap <form>` (show any form you reached),
+  `here` and `hide`. `/claudou` alone shows or hides your crab.
+
 ## v0.1.1 — 2026-10-04
 
 - The side pane is small now (36 columns, 16 rows) and shows one tip at a time instead of all eight.

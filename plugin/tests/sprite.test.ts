@@ -55,39 +55,40 @@ function world(on: On, progress: Record<string, unknown> = {}) {
   on('ui.toast', () => ({ value: undefined }))
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))
   on('command.register', async () => ({ value: undefined }) as never)
-  on('ui.open', async () => ({ value: { isPlaced: true } }))
   return clock
 }
 
 const mount = ($: Engine, surface: 'terminal' | 'desktop') =>
-  $.ui.mount({ plugin: 'claudou', surface, component: 'Pane', requestId: 'claudou',
-    props: { title: 'Claudou', isFocused: false, bodyColumns: 60, placement: 'dock',
-             scroll: { offset: 0, bodyRows: 30 }, view: {} } })
+  $.ui.mount({ plugin: 'claudou', surface, component: 'AbovePrompt',
+    props: { hasSurvey: false, isWorking: false, maxRows: 20, bodyColumns: 80, scroll: { offset: 0, bodyRows: 20 } } as never })
 
 for (const surface of ['terminal', 'desktop'] as const) {
-  test(`the pane draws the crab of the current form, and it moves, on ${surface}`, async ($, on) => {
+  test(`the band draws the crab of the current form, and it moves, on ${surface}`, async ($, on) => {
     const clock = world(on)
     await $.session.start({ cwd: '/r', surface, isInteractive: true })
-    const pane = await mount($, surface)
-    const first = JSON.stringify(await pane.drawn())
-    expect(first).toContain(lines(SPRITES.crabling, 'base')[2][0].text)
+    const band = await mount($, surface)
+    const first = JSON.stringify(await band.drawn())
+    expect(first).toContain(lines(SPRITES.crabling, 'base')[2]![0]!.text)
     expect(first.includes('▀') || first.includes('▄')).toBe(true)
     const seen = new Set([first])
     for (let i = 0; i < SEQUENCE.length; i++) {
       await clock.advance(TICK_MS)
-      seen.add(JSON.stringify(await pane.drawn()))
+      seen.add(JSON.stringify(await band.drawn()))
     }
     expect(seen.size > 3).toBe(true)                 // breathing, blinking, looking around, fidgeting
   })
 }
 
-test('in French, the pane speaks French', { options: { language: 'fr' } }, async ($, on) => {
+test('in French, the crab speaks French', { options: { language: 'fr' } }, async ($, on) => {
   world(on, { days: 3, bestStreak: 3, prompts: 12, features: ['planner'] })
   await $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
-  const text = JSON.stringify(await (await mount($, 'terminal')).drawn())
+  const { text } = await $.command.run({ command: 'claudou', args: 'stats', origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 120 } })
   expect(text).toContain('Crabe violoniste')
   expect(text).toContain('Niveau 5 sur 25')
-  expect(text).toContain('Délégateur')
-  expect(text).toContain(SPRITES.fiddlerCrab.palette.O)          // level 5 draws the Fiddler crab's giant claw
-  expect(text.includes(SPRITES.crabling.palette.o)).toBe(false)
+  const drawn = JSON.stringify(await (await mount($, 'terminal')).drawn())
+  expect(drawn).toContain(SPRITES.fiddlerCrab.palette.O!)       // level 5 draws the Fiddler crab's giant claw
+  expect(drawn.includes(SPRITES.crabling.palette.o!)).toBe(false)
+  expect((await $.command.run({ command: 'claudou', args: 'talk', origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 120 } })).text).toContain('Délégateur')
 })

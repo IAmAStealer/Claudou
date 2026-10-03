@@ -15,7 +15,6 @@ function world(on: On, progress: Record<string, unknown> = {}) {
     (e.tool === 'Skill' && e.skill === 'broken' ? { result: 'no', isError: true } : { result: {}, text: 'ok' }) as never)
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))
   on('command.register', async () => ({ value: undefined }) as never)
-  on('ui.open', async () => ({ value: { isPlaced: true } }))
   on('prompt.submit', async (_$, e) => ({ text: e.text }))
   on('classic.SessionStart', async () => ({}))
   on('turn.complete', async (_$, e) => ({ text: e.answer }))
@@ -23,13 +22,14 @@ function world(on: On, progress: Record<string, unknown> = {}) {
   return { clock, toasts }
 }
 
-// What the pane shows: the mod's own record of the progress, as the player sees it.
-async function pane($: Engine, surface: 'terminal' | 'desktop' = 'terminal'): Promise<string> {
-  const mounted = await $.ui.mount({ plugin: 'claudou', surface, component: 'Pane', requestId: 'claudou',
-    props: { title: 'Claudou', isFocused: false, bodyColumns: 60, placement: 'dock',
-             scroll: { offset: 0, bodyRows: 30 }, view: {} } })
-  return JSON.stringify(await mounted.drawn())
+// What /claudou <args> answers: the mod's own record of the progress, as the player reads it.
+async function claudou($: Engine, args: string): Promise<string> {
+  const { text } = await $.command.run({
+    command: 'claudou', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 },
+  })
+  return text ?? ''
 }
+const pane = ($: Engine) => claudou($, 'stats')
 
 const start = ($: Engine, surface: 'terminal' | 'desktop' = 'terminal') =>
   $.session.start({ cwd: '/r', surface, isInteractive: true })
@@ -108,19 +108,29 @@ test('tokens add up input and output of every turn, cache left out', async ($, o
   expect(await pane($)).toContain('100,000 tokens')
 })
 
-for (const surface of ['terminal', 'desktop'] as const) {
-  test(`the pane shows the form, the level and what to try on ${surface}`, async ($, on) => {
-    world(on, { days: 3, bestStreak: 3, prompts: 12, features: ['planner'] })
-    await start($, surface)
-    const drawn = await pane($, surface)
-    expect(drawn).toContain('Fiddler crab')                    // day1, day3, streak3, prompts10, planner: level 5
-    expect(drawn).toContain('Level 5 of 25')
-    expect(drawn).toContain('Next: Horned ghost crab at level 7')
-    expect(drawn).toContain('Delegator')
-    expect(drawn.includes('Planner')).toBe(false)
-    expect(drawn.includes('Crab team')).toBe(false)               // one tip at a time keeps the pane small
-  })
-}
+test('/claudou stats shows the form, the level, the next form and the achievements', async ($, on) => {
+  world(on, { days: 3, bestStreak: 3, prompts: 12, features: ['planner'] })
+  await start($)
+  const text = await claudou($, 'stats')
+  expect(text).toContain('Fiddler crab · Level 5 of 25')         // day1, day3, streak3, prompts10, planner: level 5
+  expect(text).toContain('Next: Horned ghost crab at level 7')
+  expect(text).toContain('Achievements (5/25): Planner, First day, 3 days, 3 days in a row, 10 prompts')
+})
+
+test('/claudou hint gives the next feature to try, one at a time, until all are tried', async ($, on) => {
+  world(on, { features: ['planner'] })
+  await start($)
+  const text = await claudou($, 'hint')
+  expect(text).toContain('Try next: Delegator')
+  expect(text.includes('Crab team')).toBe(false)
+  expect(text.includes('Planner')).toBe(false)
+})
+
+test('/claudou hint says when every feature was tried', async ($, on) => {
+  world(on, { features: ['planner', 'delegator', 'crabTeam', 'skilledClaw', 'tidyTide', 'shellMemory', 'pluggedIn', 'burrow'] })
+  await start($)
+  expect(await claudou($, 'hint')).toContain('You tried every feature')
+})
 
 test('the crab planet tells the joke', async ($, on) => {
   world(on, { days: 100, bestStreak: 30, tokens: 1e8, prompts: 1000, sessions: 100,

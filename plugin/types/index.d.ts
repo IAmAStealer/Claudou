@@ -15,6 +15,6 @@ export type Progress = {
 
 declare module 'claude-code' {
   interface PluginState {
-    claudou: { progress: Progress; tick: number }
+    claudou: { progress: Progress; tick: number; hidden: boolean; chosen: string | null; bubble: string | null }
   }
 }

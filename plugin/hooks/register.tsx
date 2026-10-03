@@ -2,25 +2,37 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import * as growth from './growth'
-import type { Feature, Progress } from './growth'
-import { t as translate } from './messages'
+import type { Feature, Form, Progress } from './growth'
+import { LANGUAGES, MESSAGES, t as translate } from './messages'
 import type { Language, MessageId } from './messages'
 import { lines, poseAt, TICK_MS } from './sprite'
 import { SPRITES } from './sprites'
 
-export const PANE = 'claudou'
 export const COMMAND = 'claudou'
 export const STORE_KEY = 'progress'
-// Small: the crab (17 columns), a few lines of text and one tip. The person can still drag it bigger.
-export const PANE_SIZE = { columns: 36, rows: 16 } as const
+export const HIDDEN_KEY = 'hidden'
+export const CHOSEN_KEY = 'chosen'
+export const SPRITE_ROWS = 6                     // 12 pixel rows, two per line
+export const SPRITE_COLUMNS = 17
+export const FIRST_TALK = 250                    // ticks: the crab first speaks after 5 minutes,
+export const TALK_EVERY = 750                    // then every 15 minutes,
+export const BUBBLE_TICKS = 20                   // and its bubble stays 24 seconds
+export const TIPS = ['clear', 'mention', 'rewind', 'init', 'bang', 'context', 'model', 'escape'] as const
 
 const progress = atom({ plugin: 'claudou', key: 'progress' } as const, growth.fresh())
 const tick = atom({ plugin: 'claudou', key: 'tick' } as const, 0)       // moves the crab: one pose per tick
+const hidden = atom({ plugin: 'claudou', key: 'hidden' } as const, false)
+const chosen = atom({ plugin: 'claudou', key: 'chosen' } as const, null as string | null)   // a form picked by swap
+const bubble = atom({ plugin: 'claudou', key: 'bubble' } as const, null as string | null)   // what the crab says
 
 // The player's language, from the mod's settings (/config): English unless they chose French.
 let language: Language = 'en'
 const t = (id: MessageId, values: Record<string, string | number> = {}) => translate(id, language, values)
 let ticking = false
+let ticks = 0
+let talkAt = FIRST_TALK
+let quietAt = 0
+let tipsSaid = 0
 
 // Subagents the main loop started in the turn under way (Crab team: 3 in one turn).
 let agentsThisTurn = 0
@@ -34,7 +46,10 @@ async function change($: EngineInterface, step: (p: Progress) => Progress): Prom
   await update($, progress, () => after)
   for (const a of growth.unlocked(before, after)) $.ui.toast(t('unlockedToast', { name: t(`ach.${a}`) }))
   const form = growth.formAt(growth.level(after))
-  if (form !== growth.formAt(growth.level(before))) $.ui.toast(t('evolvedToast', { form: t(`form.${form}`) }))
+  if (form !== growth.formAt(growth.level(before))) {
+    $.ui.toast(t('evolvedToast', { form: t(`form.${form}`) }))
+    await choose($, null)                         // a new form shows itself, even after a swap
+  }
 }
 
 const use = ($: EngineInterface, feature: Feature) => change($, p => growth.used(p, feature))
@@ -42,16 +57,21 @@ const use = ($: EngineInterface, feature: Feature) => change($, p => growth.used
 export const register: Register = (on, options) => {
   language = options?.language === 'fr' ? 'fr' : 'en'
   ticking = false
+  ticks = 0
+  talkAt = FIRST_TALK
 
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: COMMAND, description: t('commandHelp') })
     const stored = growth.normalize(await $.store.get(STORE_KEY))
     await update($, progress, () => stored)
+    const isHidden = (await $.store.get(HIDDEN_KEY)) === true
+    await update($, hidden, () => isHidden)
+    const picked = await $.store.get(CHOSEN_KEY)
+    await update($, chosen, () => (typeof picked === 'string' ? picked : null))
     if (!ticking) {
       ticking = true
-      $.clock.every(TICK_MS, () => void update($, tick, n => n + 1))
+      $.clock.every(TICK_MS, () => void beat($))
     }
-    void $.ui.open({ id: PANE, title: t('paneTitle'), ...PANE_SIZE })      // waits for a window of 144 columns or more
 
     return next(e)
   })
@@ -116,43 +136,152 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: COMMAND }, async $ => {
-    await $.ui.open({ id: PANE, title: t('paneTitle'), ...PANE_SIZE })
+  on('command.run', { command: COMMAND }, async ($, e) => {
+    const word = e.args.trim().toLowerCase()
+    const p = await read($, progress)
+    if (word === '') return { text: await show($, await read($, hidden)) }
+    if (word === 'here' || word === 'show') return { text: await show($, true) }
+    if (word === 'hide' || word === 'off') return { text: await show($, false) }
+    if (word === 'hint') return { text: hint(p) }
+    if (word === 'stats') return { text: stats(p) }
+    if (word === 'talk') return { text: await say($, nextTip(p)) }
+    if (word === 'pets') return { text: pets(p, await shown($)) }
+    if (word === 'swap' || word.startsWith('swap ')) return { text: await swap($, p, word.slice(4).trim()) }
 
-    return { text: t('paneOpened') }
+    return { text: t('help') }
   })
 
-  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
+  // The crab on the right of the band just above the prompt, and what it says on its left.
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    const room = e.props.bodyColumns - SPRITE_COLUMNS
+    if (e.props.hasSurvey || e.props.maxRows < SPRITE_ROWS || room < 0 || (await read($, hidden))) return next(e)
     const { Box, Text } = $.ui.resolve(e)
-    const p = await read($, progress)
-    const lvl = growth.level(p)
-    const form = growth.formAt(lvl)
-    const next = growth.nextForm(lvl)
-    const toTry = growth.FEATURES.filter(f => !p.features.includes(f))
+    const form = await shown($)
     const pose = poseAt(await read($, tick))
+    const said = await read($, bubble)
+    const width = Math.min(48, room - 1)
 
     return (
-      <Box flexDirection="column">
-        {lines(SPRITES[form], pose).map((runs, r) => (
-          <Box key={`sprite${r}`} flexDirection="row">
-            {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
+      <Box flexDirection="row" width={e.props.bodyColumns} justifyContent="flex-end" alignItems="center">
+        {said && width >= 16 ? (
+          <Box borderStyle="round" borderColor="#e07a5f" paddingX={1} width={width} marginRight={1}>
+            <Text wrap="wrap">{said}</Text>
           </Box>
-        ))}
-        <Text> </Text>
-        {lvl === 0 && p.prompts === 0 && <Text>{t('hatching')}</Text>}
-        <Text bold>{t(`form.${form}`)}</Text>
-        <Text>{t('level', { n: lvl, max: growth.ACHIEVEMENTS.length })}</Text>
-        {next
-          ? <Text dimColor>{t('nextForm', { form: t(`form.${next.id}`), n: next.level })}</Text>
-          : <Text>{t('lastForm')}</Text>}
-        <Text dimColor>
-          {t('stats', { days: p.days, streak: p.bestStreak, tokens: p.tokens.toLocaleString(language),
-                        prompts: p.prompts, sessions: p.sessions })}
-        </Text>
-        {toTry.length > 0 && <Text> </Text>}
-        {toTry.length > 0 && <Text>{t('toFind')} <Text bold>{t(`ach.${toTry[0]}`)}</Text></Text>}
-        {toTry.length > 0 && <Text dimColor>{t(`how.${toTry[0]}`)}</Text>}
+        ) : null}
+        <Box flexDirection="column">
+          {lines(SPRITES[form], pose).map((runs, r) => (
+            <Box key={`sprite${r}`} flexDirection="row">
+              {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
+            </Box>
+          ))}
+        </Box>
       </Box>
     )
   })
+}
+
+// One tick: the crab moves, now and then it speaks, and its bubble goes after a while.
+async function beat($: EngineInterface): Promise<void> {
+  ticks += 1
+  await update($, tick, n => n + 1)
+  if (ticks >= talkAt) {
+    talkAt = ticks + TALK_EVERY
+    await say($, nextTip(await read($, progress)))
+  } else if (ticks === quietAt) {
+    await update($, bubble, () => null)
+  }
+}
+
+async function say($: EngineInterface, text: string): Promise<string> {
+  quietAt = ticks + BUBBLE_TICKS
+  await update($, bubble, () => text)
+
+  return text
+}
+
+// Features not tried yet come first, in order; after them, Claude Code tips in turn.
+function nextTip(p: Progress): string {
+  const untried = growth.FEATURES.find(f => !p.features.includes(f))
+  if (untried) return `${t(`ach.${untried}`)}: ${t(`how.${untried}`)}`
+  tipsSaid += 1
+
+  return t(`tip.${TIPS[(tipsSaid - 1) % TIPS.length]}`)
+}
+
+// The form on screen: the one picked by swap while the crab has reached it, otherwise the newest.
+async function shown($: EngineInterface): Promise<Form> {
+  const lvl = growth.level(await read($, progress))
+  const id = await read($, chosen)
+  const picked = growth.FORMS.find(f => f.id === id)
+
+  return picked && lvl >= picked.level ? picked.id : growth.formAt(lvl)
+}
+
+async function choose($: EngineInterface, form: Form | null): Promise<void> {
+  await $.store.set(CHOSEN_KEY, form)
+  await update($, chosen, () => form)
+}
+
+const simple = (name: string) => name.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '')
+
+// A form by its number in /claudou pets, its name in any language, or the start of it.
+function findForm(name: string): (typeof growth.FORMS)[number] | undefined {
+  const n = Number(name)
+  if (Number.isInteger(n) && n >= 1) return growth.FORMS[n - 1]
+  const wanted = simple(name)
+  const names = (id: Form) => [id, ...LANGUAGES.map(l => MESSAGES[`form.${id}`][l])].map(simple)
+
+  return growth.FORMS.find(f => names(f.id).includes(wanted)) ?? growth.FORMS.find(f => names(f.id).some(x => x.startsWith(wanted)))
+}
+
+async function swap($: EngineInterface, p: Progress, name: string): Promise<string> {
+  const lvl = growth.level(p)
+  if (name === '') {
+    await choose($, null)
+    return t('swapNewest', { form: t(`form.${growth.formAt(lvl)}`) })
+  }
+  const form = findForm(name)
+  if (!form) return t('swapUnknown', { name })
+  if (lvl < form.level) return t('swapLocked', { form: t(`form.${form.id}`), n: form.level })
+  await choose($, form.id)
+
+  return t('swapped', { form: t(`form.${form.id}`) })
+}
+
+function pets(p: Progress, current: Form): string {
+  const lvl = growth.level(p)
+  const reached = growth.FORMS.filter(f => lvl >= f.level)
+  const list = reached.map((f, i) => `${f.id === current ? '▸' : ' '} ${i + 1}. ${t(`form.${f.id}`)}`)
+  const next = growth.nextForm(lvl)
+
+  return [t('pets', { n: reached.length, max: growth.FORMS.length }), ...list,
+          next ? t('nextForm', { form: t(`form.${next.id}`), n: next.level }) : t('lastForm'), t('petsNext')].join('\n')
+}
+
+// Shows or hides the crab, everywhere and from now on; returns what to tell the person.
+async function show($: EngineInterface, visible: boolean): Promise<string> {
+  await $.store.set(HIDDEN_KEY, !visible)
+  await update($, hidden, () => !visible)
+
+  return visible ? t('shown') : t('hidden')
+}
+
+function hint(p: Progress): string {
+  const next = growth.FEATURES.find(f => !p.features.includes(f))
+
+  return next ? `${t('toFind')} ${t(`ach.${next}`)}\n${t(`how.${next}`)}` : t('allTried')
+}
+
+function stats(p: Progress): string {
+  const lvl = growth.level(p)
+  const next = growth.nextForm(lvl)
+  const done = growth.achieved(p)
+
+  return [
+    `${t(`form.${growth.formAt(lvl)}`)} · ${t('level', { n: lvl, max: growth.ACHIEVEMENTS.length })}`,
+    next ? t('nextForm', { form: t(`form.${next.id}`), n: next.level }) : t('lastForm'),
+    t('stats', { days: p.days, streak: p.bestStreak, tokens: p.tokens.toLocaleString(language), prompts: p.prompts,
+                 sessions: p.sessions }),
+    `${t('achievements', { n: done.length, max: growth.ACHIEVEMENTS.length })} ${done.map(a => t(`ach.${a}`)).join(', ')}`,
+  ].join('\n')
 }

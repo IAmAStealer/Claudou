@@ -3,13 +3,51 @@ export const LANGUAGES = ['en', 'fr'] as const
 export type Language = (typeof LANGUAGES)[number]
 
 export const MESSAGES = {
-  paneTitle: { en: 'Claudou', fr: 'Claudou' },
-  hatching: {
-    en: 'A Crabling is about to hatch. Keep working with Claude: it grows as you do.',
-    fr: 'Un Crabling va bientôt éclore. Continue à travailler avec Claude : il grandit avec toi.',
+  commandHelp: {
+    en: 'Your crab: show or hide it, or ask hint, talk, stats, pets, swap, help',
+    fr: 'Ton crabe : l\'afficher ou le cacher, ou demander hint, talk, stats, pets, swap, help',
   },
-  commandHelp: { en: 'Show your crab in a side pane', fr: 'Afficher ton crabe dans un panneau' },
-  paneOpened: { en: 'Your crab is in the side pane.', fr: 'Ton crabe est dans le panneau sur le côté.' },
+  help: {
+    en: [
+      '/claudou: show or hide your crab',
+      '/claudou hint: the next Claude Code feature to try',
+      '/claudou talk: your crab gives you a tip now',
+      '/claudou stats: level, form, counters and achievements',
+      '/claudou pets: the forms your crab reached',
+      '/claudou swap <form>: show another form you reached (swap alone goes back to the newest)',
+      '/claudou here: show your crab',
+      '/claudou hide: hide it',
+    ].join('\n'),
+    fr: [
+      '/claudou : afficher ou cacher ton crabe',
+      '/claudou hint : la prochaine fonction de Claude Code à essayer',
+      '/claudou talk : ton crabe te donne une astuce tout de suite',
+      '/claudou stats : niveau, forme, compteurs et succès',
+      '/claudou pets : les formes que ton crabe a atteintes',
+      '/claudou swap <forme> : montrer une autre forme atteinte (swap seul revient à la plus récente)',
+      '/claudou here : afficher ton crabe',
+      '/claudou hide : le cacher',
+    ].join('\n'),
+  },
+  pets: { en: 'Forms reached ({n}/{max}):', fr: 'Formes atteintes ({n}/{max}) :' },
+  petsNext: { en: 'Swap with /claudou swap <name or number>.', fr: 'Change avec /claudou swap <nom ou numéro>.' },
+  swapped: { en: 'Your crab is now a {form}.', fr: 'Ton crabe est maintenant {form}.' },
+  swapNewest: { en: 'Your crab shows its newest form: {form}.', fr: 'Ton crabe montre sa forme la plus récente : {form}.' },
+  swapLocked: {
+    en: '{form} comes at level {n}. Keep using Claude Code to get there.',
+    fr: '{form} arrive au niveau {n}. Continue à utiliser Claude Code pour y arriver.',
+  },
+  swapUnknown: { en: 'No form called "{name}". /claudou pets lists them.', fr: 'Aucune forme « {name} ». /claudou pets les liste.' },
+  shown: {
+    en: 'Your crab sits above the prompt, on the right.',
+    fr: 'Ton crabe est au-dessus de la saisie, à droite.',
+  },
+  hidden: { en: 'Your crab is hiding. /claudou brings it back.', fr: 'Ton crabe se cache. /claudou le fait revenir.' },
+  allTried: {
+    en: 'You tried every feature! Days, streaks, tokens, prompts and sessions still make your crab grow.',
+    fr: 'Tu as essayé toutes les fonctions ! Les jours, séries, jetons, messages et sessions font encore grandir ton crabe.',
+  },
+  achievements: { en: 'Achievements ({n}/{max}):', fr: 'Succès ({n}/{max}) :' },
   level: { en: 'Level {n} of {max}', fr: 'Niveau {n} sur {max}' },
   nextForm: { en: 'Next: {form} at level {n}', fr: 'Ensuite : {form} au niveau {n}' },
   lastForm: {
@@ -23,6 +61,39 @@ export const MESSAGES = {
     fr: '{days} jours · meilleure série {streak} · {tokens} jetons · {prompts} messages · {sessions} sessions',
   },
   toFind: { en: 'Try next:', fr: 'À essayer :' },
+
+  'tip.clear': {
+    en: 'Starting a new task? /clear empties the conversation, so old context doesn\'t steer the new work.',
+    fr: 'Nouvelle tâche ? /clear vide la conversation, pour que l\'ancien contexte ne guide pas le nouveau travail.',
+  },
+  'tip.mention': {
+    en: 'Type @ and a file name to put that file in your prompt: Claude reads exactly what you point at.',
+    fr: 'Tape @ et un nom de fichier pour le mettre dans ton message : Claude lit exactement ce que tu montres.',
+  },
+  'tip.rewind': {
+    en: 'Took a wrong turn? Press Esc twice to go back to an earlier message and try again from there.',
+    fr: 'Mauvaise piste ? Appuie deux fois sur Échap pour revenir à un message précédent et repartir de là.',
+  },
+  'tip.init': {
+    en: '/init writes a CLAUDE.md for this project: Claude reads it at every start, so you explain things once.',
+    fr: '/init écrit un CLAUDE.md pour ce projet : Claude le lit à chaque démarrage, tu n\'expliques qu\'une fois.',
+  },
+  'tip.bang': {
+    en: 'Start a prompt with ! to run a shell command yourself: its output lands in the conversation for Claude.',
+    fr: 'Commence un message par ! pour lancer une commande toi-même : sa sortie arrive dans la conversation.',
+  },
+  'tip.context': {
+    en: '/context shows what fills the context window, so you know when it is time to /compact or /clear.',
+    fr: '/context montre ce qui remplit le contexte, pour savoir quand faire /compact ou /clear.',
+  },
+  'tip.model': {
+    en: '/model switches the model: a faster one for small edits, the strongest one for hard problems.',
+    fr: '/model change de modèle : un rapide pour les petites retouches, le plus fort pour les problèmes durs.',
+  },
+  'tip.escape': {
+    en: 'Claude going the wrong way? Press Esc once to stop it, then say what you want instead.',
+    fr: 'Claude part dans la mauvaise direction ? Appuie une fois sur Échap pour l\'arrêter, puis dis ce que tu veux.',
+  },
 
   'form.crabling': { en: 'Crabling', fr: 'Crabichon' },
   'form.peaCrab': { en: 'Pea crab', fr: 'Pinnothère' },

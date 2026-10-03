@@ -5,7 +5,7 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/IAmAStealer/Claudou/badge)](https://scorecard.dev/viewer/?uri=github.com/IAmAStealer/Claudou)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A little pixel-art pet that lives in a side pane of [Claude Code](https://claude.com/claude-code) and grows
+A little pixel-art pet that sits above the prompt of [Claude Code](https://claude.com/claude-code) and grows
 while you work with it.
 
 It grows with **25 achievements**, one level each:
@@ -28,8 +28,21 @@ In Claude Code:
 /plugin install claudou@claudou
 ```
 
-Your crab opens in a side pane by itself when the window is wide enough (144 columns); otherwise type
-`/claudou`. It speaks English or French: choose in `/config` (Claudou, Language).
+Your crab sits on the right, just above the prompt. Now and then it says a tip in a speech bubble: first the
+Claude Code features you haven't tried, then everyday tricks. It speaks English or French: choose in `/config`
+(Claudou, Language).
+
+| Command | What it does |
+| --- | --- |
+| `/claudou` | show or hide your crab |
+| `/claudou hint` | the next Claude Code feature to try, and how |
+| `/claudou talk` | your crab gives you a tip now |
+| `/claudou stats` | form, level, counters and achievements |
+| `/claudou pets` | the forms your crab reached |
+| `/claudou swap <form>` | show another form you reached, by number or name (`swap` alone: the newest) |
+| `/claudou here`, `/claudou hide` | show it, hide it |
+
+To update: `/plugin marketplace update claudou`, then `/plugin update claudou@claudou`.
 
 Coming next: good work habits (tests, reviewed diffs, small commits), other starters than crabs, and
 [Bashou](https://github.com/IAmAStealer/Bashou)'s pets in Claude Code with `bashou claude on`.

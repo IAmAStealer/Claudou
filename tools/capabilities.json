@@ -19,7 +19,6 @@
     "$.state.set",
     "$.store.get",
     "$.store.set",
-    "$.ui.open",
     "$.ui.resolve",
     "$.ui.toast"
   ]

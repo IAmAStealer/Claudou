@@ -20,7 +20,7 @@ def used(report):
     found = {"hooks": set(), "calls": set()}
     for kind in found:
         for line in re.findall(rf"❯ \S+ {kind}: (.+)", report):
-            for item in re.split(r",\s*(?![^{]*\})", line.strip()):
+            for item in re.split(r",\s*(?![^{(]*[})])", line.strip()):
                 found[kind].add(re.sub(r"\{.*\}$| \(via [^)]*\)$", "", item.strip()))
     return {k: sorted(v - {""}) for k, v in found.items()}
 
