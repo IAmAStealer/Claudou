@@ -10,8 +10,12 @@ It grows three ways:
 - **Good work habits**: tests that run and pass, diffs you review, small commits, clear prompts.
 - **Plain use**: sessions, prompts, finished turns.
 
-Claudou has its own family of pets, and you can meet some of [Bashou](https://github.com/IAmAStealer/Bashou)'s
-pets there too. Bashou players get their own pet in Claude Code with `bashou claude on`.
+Your pet starts as a tiny Crabling and grows into bigger and stranger crabs: a pea crab hiding in a mussel,
+a hermit crab, a boxer crab with its pom-poms, a fiddler crab waving its giant claw, a horned ghost crab, a
+decorator crab, a coconut crab, a Tasmanian giant crab, a Japanese spider crab… and then, since everything
+ends up a crab, one last form.
+
+You can also meet some of [Bashou](https://github.com/IAmAStealer/Bashou)'s pets there. Bashou players get their own pet in Claude Code with `bashou claude on`.
 
 Status: just started. Nothing to install yet.
 
