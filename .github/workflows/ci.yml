@@ -28,9 +28,40 @@ jobs:
       - name: Python tools
         run: python3 -m unittest discover -s tools -p 'test_*.py' -v
 
+  # The mod itself: Claude Code validates it and runs its tests; TypeScript checks the types.
+  # Both owner-approved (2026-10-03): Claude Code from Anthropic's official installer, pinned to the version
+  # vendor/claude-code.d.ts comes from; TypeScript 6.0.3 as one file checked against the npm registry's sha512.
+  plugin:
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_VERSION: "2.1.288"
+      DISABLE_AUTOUPDATER: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: The vendored API is the pinned Claude Code's
+        run: grep -qx "// Written by Claude Code $CLAUDE_CODE_VERSION." <(head -1 vendor/claude-code.d.ts)
+      - name: Claude Code
+        run: |
+          curl -fsSL https://claude.ai/install.sh -o install.sh
+          bash install.sh "$CLAUDE_CODE_VERSION"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: TypeScript 6.0.3 (no npm)
+        run: |
+          curl -fsSLo typescript.tgz https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz
+          want=$(curl -fsS https://registry.npmjs.org/typescript/6.0.3 | python3 -c "import json,sys; print(json.load(sys.stdin)['dist']['integrity'])")
+          got="sha512-$(openssl dgst -sha512 -binary typescript.tgz | base64 -w0)"
+          [ "$want" = "$got" ] || { echo "::error::typescript-6.0.3.tgz checksum mismatch"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/ts" && tar -xzf typescript.tgz -C "$RUNNER_TEMP/ts"
+      - name: Validate the mod
+        run: claude plugin validate plugin
+      - name: Types
+        run: node "$RUNNER_TEMP/ts/package/bin/tsc" -p .
+      - name: Tests
+        run: claude plugin test plugin
+
   # A commit on main with a line "release: v1.2.3" becomes that release once every check passed.
   release:
-    needs: [rules]
+    needs: [rules, plugin]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:

@@ -8,7 +8,9 @@ test('/claudou opens the pane and says so', async ($, on) => {
     opened.push(e.id)
     return { value: { isPlaced: true } }
   })
-  const { text } = await $.command.run({ command: 'claudou', args: '' })
+  const { text } = await $.command.run({
+    command: 'claudou', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 },
+  })
   expect(text).toBe(t('paneOpened'))
   expect(opened).toEqual(['claudou'])
 })
@@ -16,7 +18,8 @@ test('/claudou opens the pane and says so', async ($, on) => {
 for (const surface of ['terminal', 'desktop'] as const) {
   test(`the pane draws the hatching crab on ${surface}`, async $ => {
     const pane = await $.ui.mount({ plugin: 'claudou', surface, component: 'Pane', requestId: 'claudou',
-      props: { title: 'Claudou', isFocused: false, bodyColumns: 40, placement: 'dock' } })
+      props: { title: 'Claudou', isFocused: false, bodyColumns: 40, placement: 'dock',
+               scroll: { offset: 0, bodyRows: 20 }, view: {} } })
     expect(JSON.stringify(await pane.drawn())).toContain(t('hatching'))
   })
 }
