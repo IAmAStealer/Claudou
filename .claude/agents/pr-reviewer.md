@@ -44,6 +44,7 @@ Never check the PR out in the working tree, never install, build or run anything
      Claudou keeps counters only, sends nothing: any `$.fs` write outside its own data, `$.process`,
      `$.model` calls, network or URL use, `prompt.compose` (changing Claude's system prompt), `tool.call`
      hooks that rewrite or deny calls are major findings.
+   - `tools/capabilities.json` (what the mod may hook and call): any addition is a major finding to justify.
    - `.github/workflows/`, `tools/`, release steps; `CLAUDE.md`, `.claude/` (they steer future AI work).
    - Obfuscation, weakened or deleted tests, `skip`, lowered limits.
 3. **Rules**: a bug fix has a test that fails without it; both surfaces tested (terminal, desktop); every

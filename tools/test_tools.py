@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import capabilities
 import changelog
 import no_dependencies
 
@@ -15,6 +16,24 @@ class ChangelogTest(unittest.TestCase):
         self.assertEqual(changelog.notes("v0.2.0", text), "- New.")
         self.assertEqual(changelog.notes("v0.1.0", text), "- First.")
         self.assertEqual(changelog.notes("v0.3.0", text), "")
+
+
+class CapabilitiesTest(unittest.TestCase):
+    REPORT = ("  ❯ ./register.tsx hooks: session.start, command.run{command=claudou}, ui.render{component=Pane, requestId=claudou}\n"
+              "  ❯ ./register.tsx calls: $.command.register, $.ui.open, $.ui.resolve\n")
+
+    def test_what_the_mod_uses_is_read_from_validate(self):
+        self.assertEqual(capabilities.used(self.REPORT), {
+            "hooks": ["command.run", "session.start", "ui.render"],
+            "calls": ["$.command.register", "$.ui.open", "$.ui.resolve"]})
+        self.assertEqual(capabilities.problems(self.REPORT), [])
+
+    def test_a_new_capability_is_refused(self):
+        for extra in ("hooks: tool.call{tool=Bash}", "calls: $.fs.write", "calls: $.process.spawn", "calls: $.model.call"):
+            self.assertTrue(capabilities.problems(self.REPORT + f"  ❯ ./x.ts {extra}\n"), extra)
+
+    def test_an_empty_report_is_refused(self):
+        self.assertTrue(capabilities.problems("Validation passed"))
 
 
 class NoDependenciesTest(unittest.TestCase):

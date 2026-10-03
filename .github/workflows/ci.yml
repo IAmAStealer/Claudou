@@ -54,6 +54,8 @@ jobs:
           mkdir -p "$RUNNER_TEMP/ts" && tar -xzf typescript.tgz -C "$RUNNER_TEMP/ts"
       - name: Validate the mod
         run: claude plugin validate plugin
+      - name: Only the reviewed hooks and calls (tools/capabilities.json)
+        run: python3 tools/capabilities.py
       - name: Types
         run: node "$RUNNER_TEMP/ts/package/bin/tsc" -p .
       - name: Tests

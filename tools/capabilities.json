@@ -1,0 +1,5 @@
+{
+  "_why": "What the mod may hook and call. SECURITY.md promises counters only, nothing sent: a new capability is a reviewed change to this file (pr-reviewer flags it).",
+  "hooks": ["session.start", "command.run", "ui.render"],
+  "calls": ["$.command.register", "$.ui.open", "$.ui.resolve"]
+}
