@@ -1,0 +1,15 @@
+{
+  "name": "claudou",
+  "description": "Claudou: a pixel-art crab in a side pane of Claude Code that grows while you work",
+  "owner": {
+    "name": "Alexis Lefrancois",
+    "url": "https://github.com/IAmAStealer"
+  },
+  "plugins": [
+    {
+      "name": "claudou",
+      "source": "./plugin",
+      "description": "A pixel-art crab in a side pane that grows while you work with Claude Code, and teaches you Claude Code"
+    }
+  ]
+}

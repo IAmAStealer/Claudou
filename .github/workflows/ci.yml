@@ -52,8 +52,8 @@ jobs:
           got="sha512-$(openssl dgst -sha512 -binary typescript.tgz | base64 -w0)"
           [ "$want" = "$got" ] || { echo "::error::typescript-6.0.3.tgz checksum mismatch"; exit 1; }
           mkdir -p "$RUNNER_TEMP/ts" && tar -xzf typescript.tgz -C "$RUNNER_TEMP/ts"
-      - name: Validate the mod
-        run: claude plugin validate plugin
+      - name: Validate the mod and the marketplace that installs it
+        run: claude plugin validate plugin && claude plugin validate .
       - name: Only the reviewed hooks and calls (tools/capabilities.json)
         run: python3 tools/capabilities.py
       - name: Types

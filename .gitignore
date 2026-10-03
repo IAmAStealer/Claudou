@@ -14,3 +14,7 @@ package-lock.json
 .*.swp
 __pycache__/
 *.pyc
+
+# Written by Claude Code when it loads the mod from this folder (editor types)
+plugin/tsconfig.json
+plugin/.claude-plugin/types/

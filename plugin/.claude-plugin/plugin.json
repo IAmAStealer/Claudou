@@ -1,6 +1,6 @@
 {
   "name": "claudou",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A pixel-art crab in a side pane that grows while you work with Claude Code, and teaches you Claude Code",
   "license": "MIT",
   "repository": "https://github.com/IAmAStealer/Claudou",
