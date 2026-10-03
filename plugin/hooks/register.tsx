@@ -3,13 +3,22 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import * as growth from './growth'
 import type { Feature, Progress } from './growth'
-import { t } from './messages'
+import { t as translate } from './messages'
+import type { Language, MessageId } from './messages'
+import { lines, poseAt, TICK_MS } from './sprite'
+import { SPRITES } from './sprites'
 
 export const PANE = 'claudou'
 export const COMMAND = 'claudou'
 export const STORE_KEY = 'progress'
 
 const progress = atom({ plugin: 'claudou', key: 'progress' } as const, growth.fresh())
+const tick = atom({ plugin: 'claudou', key: 'tick' } as const, 0)       // moves the crab: one pose per tick
+
+// The player's language, from the mod's settings (/config): English unless they chose French.
+let language: Language = 'en'
+const t = (id: MessageId, values: Record<string, string | number> = {}) => translate(id, language, values)
+let ticking = false
 
 // Subagents the main loop started in the turn under way (Crab team: 3 in one turn).
 let agentsThisTurn = 0
@@ -21,18 +30,25 @@ async function change($: EngineInterface, step: (p: Progress) => Progress): Prom
   if (after === before) return
   await $.store.set(STORE_KEY, after)
   await update($, progress, () => after)
-  for (const a of growth.unlocked(before, after)) $.ui.toast(t('unlockedToast', 'en', { name: t(`ach.${a}`) }))
+  for (const a of growth.unlocked(before, after)) $.ui.toast(t('unlockedToast', { name: t(`ach.${a}`) }))
   const form = growth.formAt(growth.level(after))
-  if (form !== growth.formAt(growth.level(before))) $.ui.toast(t('evolvedToast', 'en', { form: t(`form.${form}`) }))
+  if (form !== growth.formAt(growth.level(before))) $.ui.toast(t('evolvedToast', { form: t(`form.${form}`) }))
 }
 
 const use = ($: EngineInterface, feature: Feature) => change($, p => growth.used(p, feature))
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  language = options?.language === 'fr' ? 'fr' : 'en'
+  ticking = false
+
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: COMMAND, description: t('commandHelp') })
     const stored = growth.normalize(await $.store.get(STORE_KEY))
     await update($, progress, () => stored)
+    if (!ticking) {
+      ticking = true
+      $.clock.every(TICK_MS, () => void update($, tick, n => n + 1))
+    }
     void $.ui.open({ id: PANE, title: t('paneTitle') })      // waits for a window of 144 columns or more
 
     return next(e)
@@ -111,18 +127,25 @@ export const register: Register = on => {
     const form = growth.formAt(lvl)
     const next = growth.nextForm(lvl)
     const toTry = growth.FEATURES.filter(f => !p.features.includes(f))
+    const pose = poseAt(await read($, tick))
 
     return (
       <Box flexDirection="column">
+        {lines(SPRITES[form], pose).map((runs, r) => (
+          <Box key={`sprite${r}`} flexDirection="row">
+            {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
+          </Box>
+        ))}
+        <Text> </Text>
         {lvl === 0 && p.prompts === 0 && <Text>{t('hatching')}</Text>}
         <Text bold>{t(`form.${form}`)}</Text>
-        <Text>{t('level', 'en', { n: lvl, max: growth.ACHIEVEMENTS.length })}</Text>
+        <Text>{t('level', { n: lvl, max: growth.ACHIEVEMENTS.length })}</Text>
         {next
-          ? <Text dimColor>{t('nextForm', 'en', { form: t(`form.${next.id}`), n: next.level })}</Text>
+          ? <Text dimColor>{t('nextForm', { form: t(`form.${next.id}`), n: next.level })}</Text>
           : <Text>{t('lastForm')}</Text>}
         <Text dimColor>
-          {t('stats', 'en', { days: p.days, streak: p.bestStreak, tokens: p.tokens.toLocaleString('en'),
-                              prompts: p.prompts, sessions: p.sessions })}
+          {t('stats', { days: p.days, streak: p.bestStreak, tokens: p.tokens.toLocaleString(language),
+                        prompts: p.prompts, sessions: p.sessions })}
         </Text>
         {toTry.length > 0 && <Text> </Text>}
         {toTry.length > 0 && <Text>{t('toFind')}</Text>}

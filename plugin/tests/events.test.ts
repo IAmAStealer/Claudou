@@ -38,8 +38,7 @@ const endTurn = ($: Engine, usage?: { input_tokens: number; output_tokens: numbe
     ...(usage ? { usage: { ...usage, cache_read_input_tokens: 50_000, cache_creation_input_tokens: 9000, model: 'm' } } : {}) })
 
 test('prompts on three days in a row unlock First day, 3 days and 3 days in a row', async ($, on) => {
-  const { clock, toasts } = world(on)
-  await start($)
+  const { clock, toasts } = world(on)              // no session start: its animation timer would tick all day
   for (let i = 0; i < 3; i++) {
     await $.prompt.submit({ text: 'hi', wait: false, origin: { kind: 'composer' } })
     await clock.advance(DAY)

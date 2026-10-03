@@ -8,5 +8,17 @@
     "name": "Alexis Lefrancois",
     "url": "https://github.com/IAmAStealer"
   },
-  "types": "./types/index.d.ts"
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "The language your crab speaks: en (English) or fr (français)",
+      "default": "en",
+      "options": [
+        "en",
+        "fr"
+      ]
+    }
+  }
 }

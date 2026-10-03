@@ -36,6 +36,10 @@ class PetsTest(unittest.TestCase):
             name = re.sub(r"(?<!^)([A-Z])", r"_\1", form).lower()          # peaCrab -> pea_crab
             self.assertTrue((PETS / f"{name}.json").exists(), name)
 
+    def test_the_mod_carries_the_sprites_as_they_are(self):
+        import sprites_ts
+        self.assertEqual(sprites_ts.OUT.read_text(), sprites_ts.source(), "run python3 tools/sprites_ts.py")
+
 
 if __name__ == "__main__":
     unittest.main()
