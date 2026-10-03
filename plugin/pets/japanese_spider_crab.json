@@ -1,0 +1,46 @@
+{
+ "name": "japanese_spider_crab",
+ "palette": {
+  "o": "#c9602e",
+  "O": "#f2995e",
+  "L": "#f2995e",
+  "R": "#e0703a",
+  "D": "#a84a24",
+  "s": "#f3d2b8",
+  "e": "#3a3f44",
+  "g": "#e6eaec"
+ },
+ "base": [
+  ".................",
+  ".O.............O.",
+  "o.o...........o.o",
+  "o..o.........o..o",
+  "o...o.LLLLL.o...o",
+  "o.OooRgeRegRooO.o",
+  "o.o..RRRRsRR..o.o",
+  "s.o...DDDDD...o.s",
+  "o.s....o.o....s.o",
+  "o.o...o...o...o.o",
+  "s.o...s...s...o.s",
+  "o.s...........s.o"
+ ],
+ "poses": {
+  "inhale": {
+   "1": "O...............O",
+   "2": ".o.............o."
+  },
+  "closed": {
+   "5": "o.OooRDDRDDRooO.o"
+  },
+  "left": {
+   "5": "o.OooRegRegRooO.o"
+  },
+  "right": {
+   "5": "o.OooRgeRgeRooO.o"
+  },
+  "fidget": {
+   "9": "o.o..o.....o..o.o",
+   "10": "s.o..s.....s..o.s"
+  }
+ }
+}
