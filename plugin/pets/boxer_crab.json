@@ -1,0 +1,43 @@
+{
+ "name": "boxer_crab",
+ "palette": {
+  "O": "#e2572e",
+  "C": "#f6e3c8",
+  "k": "#6b1a12",
+  "o": "#ee7d45",
+  "W": "#fbfbf6",
+  "s": "#ada593",
+  "e": "#111111"
+ },
+ "base": [
+  ".................",
+  "......o...o......",
+  ".....kkkkkkk.....",
+  "....kOOkCkOOk....",
+  ".WW.kOeCCCeOk.WW.",
+  "WWWWkCOOOOOCkWWWW",
+  "sWWWskOOCOOksWWWs",
+  ".ss.o.kkkkk.o.ss.",
+  "...k.o.....o.k...",
+  "..o..k.....k..o..",
+  ".k...o.....o...k.",
+  "o...k.......k...o"
+ ],
+ "poses": {
+  "inhale": {
+   "3": "-ss-----------ss-"
+  },
+  "closed": {
+   "4": "------k---k------"
+  },
+  "left": {
+   "4": "-----eOCCeCO-----"
+  },
+  "right": {
+   "4": "-----OCeCCOe-----"
+  },
+  "fidget": {
+   "4": "W..W---------W..W"
+  }
+ }
+}
