@@ -1,46 +1,46 @@
 {
  "name": "coconut_crab",
  "palette": {
-  "a": "#8f7fb8",
-  "P": "#5b3f8f",
+  "a": "#8f8aa8",
+  "A": "#4f4866",
+  "L": "#8f9cbc",
+  "G": "#5d6a8a",
+  "H": "#6f5a7a",
   "w": "#c8cdd0",
-  "e": "#3a3f44",
-  "B": "#3d5fc4",
-  "b": "#7393ea",
-  "C": "#8a5a33",
-  "c": "#5a3a20",
-  "h": "#b9844f"
+  "C": "#7a4f2c",
+  "c": "#4f3219",
+  "h": "#a8733f"
  },
  "base": [
-  "..a...........a..",
-  "...a.........a...",
-  "....aPPPPPPPa....",
-  "...PwePPPPPewP...",
-  "..BPPPPPPPPPPPB..",
-  ".BBbPPPPPPPPPbBB.",
-  "B.BbB.PPPPP.BbB.B",
-  "B..BbB.....BbB..B",
-  "....BBcCCCcBB....",
-  ".....chCCCCc.....",
-  ".....cCCCCCc.....",
-  "......ccccc......"
+  ".............a..a",
+  "..AAA..LLLLL.a.a.",
+  ".AAAAAGGGGGGGHa..",
+  ".AAAAAGGGGGGHwH..",
+  ".AAAAGGGGGGGGHH..",
+  "..AAG..G...G...G.",
+  "....G.cGCCcG...G.",
+  "....GcCGhCCcG..G.",
+  "...G.cCGCCCc.G.GG",
+  "...G.cCCChCc.G...",
+  "......ccccc......",
+  "................."
  ],
  "poses": {
   "inhale": {
-   "0": ".a.............a.",
-   "1": "..a...........a.."
+   "0": "............a...a"
   },
   "closed": {
-   "3": "----PP-----PP----"
+   "3": "-------------H---"
   },
   "left": {
-   "3": "----ew-----ew----"
+   "3": "------------wH---"
   },
   "right": {
-   "3": "----we-----we----"
+   "3": "-------------Hw--"
   },
   "fidget": {
-   "7": "B..BbBB...BBbB..B"
+   "7": "----------------G",
+   "8": "---------------G."
   }
  }
 }
