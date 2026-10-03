@@ -44,7 +44,7 @@ export const FORMS = [
   { id: 'boxerCrab', level: 3 },
   { id: 'fiddlerCrab', level: 5 },
   { id: 'hornedGhostCrab', level: 7 },
-  { id: 'decoratorCrab', level: 9 },
+  { id: 'halloweenCrab', level: 9 },
   { id: 'coconutCrab', level: 12 },
   { id: 'tasmanianGiantCrab', level: 15 },
   { id: 'japaneseSpiderCrab', level: 19 },

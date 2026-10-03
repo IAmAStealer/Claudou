@@ -30,7 +30,7 @@ export const MESSAGES = {
   'form.boxerCrab': { en: 'Boxer crab', fr: 'Crabe boxeur' },
   'form.fiddlerCrab': { en: 'Fiddler crab', fr: 'Crabe violoniste' },
   'form.hornedGhostCrab': { en: 'Horned ghost crab', fr: 'Crabe fantôme à cornes' },
-  'form.decoratorCrab': { en: 'Decorator crab', fr: 'Crabe décorateur' },
+  'form.halloweenCrab': { en: 'Halloween moon crab', fr: 'Crabe d\'Halloween' },
   'form.coconutCrab': { en: 'Coconut crab', fr: 'Crabe de cocotier' },
   'form.tasmanianGiantCrab': { en: 'Tasmanian giant crab', fr: 'Crabe géant de Tasmanie' },
   'form.japaneseSpiderCrab': { en: 'Japanese spider crab', fr: 'Crabe-araignée géant du Japon' },

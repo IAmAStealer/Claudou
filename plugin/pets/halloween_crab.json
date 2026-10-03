@@ -1,0 +1,44 @@
+{
+ "name": "halloween_crab",
+ "palette": {
+  "H": "#6a5a78",
+  "K": "#2a2530",
+  "h": "#9a88aa",
+  "R": "#e8562e",
+  "e": "#2a2530",
+  "P": "#a98bd6",
+  "T": "#ece2f6",
+  "O": "#f07a3a"
+ },
+ "base": [
+  ".................",
+  ".....HHHHHHH.....",
+  "....HKKKKKKKH....",
+  ".OO.HKKKKKKKH.OO.",
+  "O..RRRRRRRRRRR..O",
+  "O.ORReRRRRReRRO.O",
+  "O.O.PPPPRPPPP.O.O",
+  ".O.PPPPTRTPPPP.O.",
+  ".O..PPP...PPP..O.",
+  "O...............O",
+  ".................",
+  "................."
+ ],
+ "poses": {
+  "inhale": {
+   "1": ".....hhhhhhh....."
+  },
+  "closed": {
+   "5": "-----R-----R-----"
+  },
+  "left": {
+   "5": "----eR----eR-----"
+  },
+  "right": {
+   "5": "-----Re-----Re---"
+  },
+  "fidget": {
+   "7": ".O.PPPPPRPPPPP.O."
+  }
+ }
+}
