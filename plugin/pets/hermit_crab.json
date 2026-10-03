@@ -1,0 +1,46 @@
+{
+ "name": "hermit_crab",
+ "palette": {
+  "d": "#6e4e2e",
+  "S": "#e2c493",
+  "s": "#b98d55",
+  "a": "#e07a5a",
+  "r": "#d9573b",
+  "R": "#a63a26",
+  "e": "#1b1b1b",
+  "k": "#8f3322"
+ },
+ "base": [
+  ".................",
+  ".................",
+  "...ddddd.........",
+  "..dSSSSSd....a.a.",
+  ".dSsdddsSd....a.a",
+  ".dSdSSSdSd..rrrr.",
+  ".dSdSdsdSd.rerer.",
+  ".dSdsSSsSdrrrrrr.",
+  "..dSSSSSdRRRrrRr.",
+  "...ddddddRRR.rR..",
+  "........r.r.r.r..",
+  "................."
+ ],
+ "poses": {
+  "inhale": {
+   "3": "-------------a---",
+   "4": "-------------a.a."
+  },
+  "closed": {
+   "6": "-----------rkrkr-"
+  },
+  "left": {
+   "6": "-----------errer-"
+  },
+  "right": {
+   "6": "-----------rrere-"
+  },
+  "fidget": {
+   "8": "---------RR.rrRr-",
+   "9": "--------RRRR.rR.."
+  }
+ }
+}
