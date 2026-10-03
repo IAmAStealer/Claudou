@@ -12,5 +12,5 @@
     "skipLibCheck": false,
     "types": []
   },
-  "include": ["vendor/claude-code.d.ts", "plugin/hooks", "plugin/tests"]
+  "include": ["vendor/claude-code.d.ts", "plugin/hooks", "plugin/types", "plugin/tests"]
 }

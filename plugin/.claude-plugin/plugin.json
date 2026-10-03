@@ -7,5 +7,6 @@
   "author": {
     "name": "Alexis Lefrancois",
     "url": "https://github.com/IAmAStealer"
-  }
+  },
+  "types": "./types/index.d.ts"
 }

@@ -20,16 +20,16 @@ class ChangelogTest(unittest.TestCase):
 
 class CapabilitiesTest(unittest.TestCase):
     REPORT = ("  ❯ ./register.tsx hooks: session.start, command.run{command=claudou}, ui.render{component=Pane, requestId=claudou}\n"
-              "  ❯ ./register.tsx calls: $.command.register, $.ui.open, $.ui.resolve\n")
+              "  ❯ ./register.tsx calls: $.command.register, $.store.set (via change), $.ui.open, $.ui.resolve\n")
 
     def test_what_the_mod_uses_is_read_from_validate(self):
         self.assertEqual(capabilities.used(self.REPORT), {
             "hooks": ["command.run", "session.start", "ui.render"],
-            "calls": ["$.command.register", "$.ui.open", "$.ui.resolve"]})
+            "calls": ["$.command.register", "$.store.set", "$.ui.open", "$.ui.resolve"]})
         self.assertEqual(capabilities.problems(self.REPORT), [])
 
     def test_a_new_capability_is_refused(self):
-        for extra in ("hooks: tool.call{tool=Bash}", "calls: $.fs.write", "calls: $.process.spawn", "calls: $.model.call"):
+        for extra in ("hooks: prompt.compose", "calls: $.tool.call", "calls: $.fs.write", "calls: $.process.spawn", "calls: $.model.call"):
             self.assertTrue(capabilities.problems(self.REPORT + f"  ❯ ./x.ts {extra}\n"), extra)
 
     def test_an_empty_report_is_refused(self):
