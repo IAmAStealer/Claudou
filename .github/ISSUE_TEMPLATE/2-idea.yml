@@ -1,0 +1,11 @@
+name: Idea
+description: A new crab, an achievement, a tip about Claude Code, anything that would make Claudou better
+labels: ["idea"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: What should Claudou do, and what would you get from it?
+    validations:
+      required: true

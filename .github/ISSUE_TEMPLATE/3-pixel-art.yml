@@ -1,0 +1,11 @@
+name: Pixel art
+description: Draw or fix a crab
+labels: ["pixel art"]
+body:
+  - type: textarea
+    id: art
+    attributes:
+      label: Which crab, and what changes
+      description: Attach a PNG at 1x scale (every pixel opaque or transparent). Your own work, shared under the MIT license.
+    validations:
+      required: true

@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in Claudou doesn't work as it should
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, and what Claudou did. Paste the exact message if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Claudou and Claude Code versions
+      description: "`claude --version`, and Claudou's version from `/plugin`"
+      placeholder: Claude Code 2.1.288, Claudou 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where you use Claude Code
+      options:
+        - Terminal
+        - Desktop app
+        - VS Code
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Screenshot or output
+      description: A screenshot helps for anything drawn (the pane, the crab).
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before sending
+      options:
+        - label: I looked at the open issues and this one isn't there yet.
+          required: true
+        - label: My paste holds no private code, prompt, token or path I want to keep for myself.
+          required: true

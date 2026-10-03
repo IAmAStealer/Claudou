@@ -1,0 +1,11 @@
+{
+  "name": "claudou",
+  "version": "0.0.0",
+  "description": "A pixel-art crab in a side pane that grows while you work with Claude Code, and teaches you Claude Code",
+  "license": "MIT",
+  "repository": "https://github.com/IAmAStealer/Claudou",
+  "author": {
+    "name": "Alexis Lefrancois",
+    "url": "https://github.com/IAmAStealer"
+  }
+}

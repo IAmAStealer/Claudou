@@ -1,0 +1,6 @@
+# Unix line endings everywhere.
+* text=auto eol=lf
+*.png binary
+# GitHub's language bar: docs and the vendored Claude Code types are not our code.
+doc/** linguist-documentation
+vendor/** linguist-vendored

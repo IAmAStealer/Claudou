@@ -1,0 +1,16 @@
+# Local notes (see CLAUDE.md)
+doc/JOURNAL.md
+doc/PLAN.md
+.idea
+bug_report
+# Local harness: git hooks and checks, never committed
+harness/
+# Written by Claude Code when it loads the mod (the committed copy is vendor/claude-code.d.ts)
+plugin/.claude-plugin/types/
+# Never committed: Claudou has no npm dependencies (see CLAUDE.md)
+node_modules/
+package-lock.json
+*.swp
+.*.swp
+__pycache__/
+*.pyc
