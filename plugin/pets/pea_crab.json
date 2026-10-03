@@ -1,0 +1,42 @@
+{
+ "name": "pea_crab",
+ "palette": {
+  "m": "#3e4c78",
+  "M": "#6378ad",
+  "i": "#c9d2ea",
+  "c": "#f2b0a0",
+  "e": "#1b1b1b",
+  "k": "#b9786a"
+ },
+ "base": [
+  ".................",
+  ".................",
+  ".................",
+  "........mmmmm....",
+  ".....mmmMMMMMm...",
+  "...mmMMMMiiiii...",
+  "..mMMii..c...c...",
+  ".mMMii...cecec...",
+  "mMiiiiiiiicccii..",
+  ".mMMMMMMMMMMMMm..",
+  "..mmMMMMMMMMmm...",
+  ".....mmmmmmm....."
+ ],
+ "poses": {
+  "inhale": {
+   "5": "---------c---c---"
+  },
+  "closed": {
+   "7": "---------ckckc---"
+  },
+  "left": {
+   "7": "---------ececc---"
+  },
+  "right": {
+   "7": "---------ccece---"
+  },
+  "fidget": {
+   "6": "----------c.c----"
+  }
+ }
+}
