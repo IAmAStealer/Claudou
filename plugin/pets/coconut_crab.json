@@ -1,0 +1,46 @@
+{
+ "name": "coconut_crab",
+ "palette": {
+  "a": "#8f7fb8",
+  "P": "#5b3f8f",
+  "w": "#c8cdd0",
+  "e": "#3a3f44",
+  "B": "#3d5fc4",
+  "b": "#7393ea",
+  "C": "#8a5a33",
+  "c": "#5a3a20",
+  "h": "#b9844f"
+ },
+ "base": [
+  "..a...........a..",
+  "...a.........a...",
+  "....aPPPPPPPa....",
+  "...PwePPPPPewP...",
+  "..BPPPPPPPPPPPB..",
+  ".BBbPPPPPPPPPbBB.",
+  "B.BbB.PPPPP.BbB.B",
+  "B..BbB.....BbB..B",
+  "....BBcCCCcBB....",
+  ".....chCCCCc.....",
+  ".....cCCCCCc.....",
+  "......ccccc......"
+ ],
+ "poses": {
+  "inhale": {
+   "0": ".a.............a.",
+   "1": "..a...........a.."
+  },
+  "closed": {
+   "3": "----PP-----PP----"
+  },
+  "left": {
+   "3": "----ew-----ew----"
+  },
+  "right": {
+   "3": "----we-----we----"
+  },
+  "fidget": {
+   "7": "B..BbBB...BBbB..B"
+  }
+ }
+}
