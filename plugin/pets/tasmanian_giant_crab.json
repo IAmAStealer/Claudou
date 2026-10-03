@@ -1,42 +1,47 @@
 {
  "name": "tasmanian_giant_crab",
  "palette": {
-  "k": "#4f555c",
+  "k": "#3d4248",
+  "K": "#9aa2aa",
+  "L": "#f2774f",
   "R": "#d8452e",
-  "r": "#f6a58a",
-  "W": "#c9b48f",
-  "e": "#3a3f44"
+  "D": "#9e2f1f",
+  "s": "#f8cbb8",
+  "W": "#ece0c6",
+  "T": "#b59c74",
+  "e": "#3a3f44",
+  "g": "#e6eaec"
  },
  "base": [
-  "..........kk..kk.",
-  "..k.k.....kk..kk.",
-  "..RRR.....RRRRRR.",
-  "...W......RRrRRR.",
-  "....W.RRRRRWRRR..",
-  ".....ReRRReR.....",
-  ".WWWRRRRRRRRRWWW.",
-  "WW..RRRRRRRRR..WW",
-  "W.WWRRRRRRRRRWW.W",
-  "W.WW.RRRRRRR.WW.W",
-  "W.W...........W.W",
-  "..W...........W.."
+  "..........kK..kK.",
+  "..kK......kk..kk.",
+  "..LRD.....LRRRRD.",
+  "...W......RsRRsD.",
+  "....W.LLLLLWRRD..",
+  ".....LgeRegL.....",
+  ".WWWRRsRRRsRDTWW.",
+  "WT..RRRRRsRRD..TW",
+  "W.WTDRRRRRRRDTW.W",
+  "W.WT.DDDDDDD.TW.W",
+  "T.W...........W.T",
+  "..T...........T.."
  ],
  "poses": {
   "inhale": {
-   "0": ".........k......k"
+   "0": ".........kK....kK"
   },
   "closed": {
-   "5": "------R---R------"
+   "5": ".....LDDRDDL....."
   },
   "left": {
-   "5": "-----eR--eR------"
+   "5": ".....LegRegL....."
   },
   "right": {
-   "5": "------Re--Re-----"
+   "5": ".....LgeRgeL....."
   },
   "fidget": {
    "0": ".................",
-   "1": "..k.k......kkkk.."
+   "1": "..kK......kkkkK.."
   }
  }
 }
