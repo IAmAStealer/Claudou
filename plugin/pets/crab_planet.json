@@ -1,0 +1,48 @@
+{
+ "name": "crab_planet",
+ "palette": {
+  "L": "#8cc4f5",
+  "B": "#3f7fd1",
+  "D": "#25508f",
+  "G": "#6cbf5a",
+  "V": "#3f8a3a",
+  "e": "#3a3f44",
+  "w": "#e6eaec",
+  "o": "#e2672f",
+  "O": "#f2995e"
+ },
+ "base": [
+  "......we.ew......",
+  ".......o.o.......",
+  "......LLLBB......",
+  "O.O..LGGBBBB..O.O",
+  "OOO.LGGGBBBBB.OOO",
+  ".oooLLGBBBBGBooo.",
+  "....LBBBBBGVD....",
+  "....BBBBBGVVD....",
+  "....BGGBBBDDD....",
+  ".....BGBBDDD.....",
+  "..o..oBBDDDo..o..",
+  ".o..o.......o..o."
+ ],
+ "poses": {
+  "inhale": {
+   "2": "O.O...LLLBB...O.O",
+   "3": "OOO..LGGBBBB..OOO",
+   "4": ".oooLGGGBBBBBooo.",
+   "5": "....LLGBBBBGB...."
+  },
+  "closed": {
+   "0": "------oo.oo------"
+  },
+  "left": {
+   "0": "------ew.ew------"
+  },
+  "right": {
+   "0": "------we.we------"
+  },
+  "fidget": {
+   "3": "OO-------------OO"
+  }
+ }
+}

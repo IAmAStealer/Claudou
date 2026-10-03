@@ -1,10 +1,12 @@
 """Every sprite in plugin/pets is well formed: python3 -m unittest discover -s tools -p 'test_*.py'"""
 import json
+import re
 import unittest
 from pathlib import Path
 
 PETS = Path(__file__).resolve().parent.parent / "plugin/pets"
 POSES = {"inhale", "closed", "left", "right", "fidget"}
+GROWTH = Path(__file__).resolve().parent.parent / "plugin/hooks/growth.ts"
 
 
 class PetsTest(unittest.TestCase):
@@ -26,6 +28,13 @@ class PetsTest(unittest.TestCase):
             for lines in d["poses"].values():
                 self.assertTrue(all(0 <= int(r) < 12 for r in lines), f.name)
                 self.assertNotEqual(lines, {}, f.name)
+
+    def test_every_form_of_the_ladder_has_its_sprite(self):
+        forms = re.findall(r"\{ id: '(\w+)', level: \d+ \}", GROWTH.read_text())
+        self.assertEqual(len(forms), 11)
+        for form in forms:
+            name = re.sub(r"(?<!^)([A-Z])", r"_\1", form).lower()          # peaCrab -> pea_crab
+            self.assertTrue((PETS / f"{name}.json").exists(), name)
 
 
 if __name__ == "__main__":
