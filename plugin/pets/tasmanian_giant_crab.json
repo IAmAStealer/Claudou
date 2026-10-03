@@ -1,0 +1,42 @@
+{
+ "name": "tasmanian_giant_crab",
+ "palette": {
+  "k": "#4f555c",
+  "R": "#d8452e",
+  "r": "#f6a58a",
+  "W": "#c9b48f",
+  "e": "#3a3f44"
+ },
+ "base": [
+  "..........kk..kk.",
+  "..k.k.....kk..kk.",
+  "..RRR.....RRRRRR.",
+  "...W......RRrRRR.",
+  "....W.RRRRRWRRR..",
+  ".....ReRRReR.....",
+  ".WWWRRRRRRRRRWWW.",
+  "WW..RRRRRRRRR..WW",
+  "W.WWRRRRRRRRRWW.W",
+  "W.WW.RRRRRRR.WW.W",
+  "W.W...........W.W",
+  "..W...........W.."
+ ],
+ "poses": {
+  "inhale": {
+   "0": ".........k......k"
+  },
+  "closed": {
+   "5": "------R---R------"
+  },
+  "left": {
+   "5": "-----eR--eR------"
+  },
+  "right": {
+   "5": "------Re--Re-----"
+  },
+  "fidget": {
+   "0": ".................",
+   "1": "..k.k......kkkk.."
+  }
+ }
+}
