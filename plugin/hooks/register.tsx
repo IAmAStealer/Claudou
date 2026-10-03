@@ -11,6 +11,8 @@ import { SPRITES } from './sprites'
 export const PANE = 'claudou'
 export const COMMAND = 'claudou'
 export const STORE_KEY = 'progress'
+// Small: the crab (17 columns), a few lines of text and one tip. The person can still drag it bigger.
+export const PANE_SIZE = { columns: 36, rows: 16 } as const
 
 const progress = atom({ plugin: 'claudou', key: 'progress' } as const, growth.fresh())
 const tick = atom({ plugin: 'claudou', key: 'tick' } as const, 0)       // moves the crab: one pose per tick
@@ -49,7 +51,7 @@ export const register: Register = (on, options) => {
       ticking = true
       $.clock.every(TICK_MS, () => void update($, tick, n => n + 1))
     }
-    void $.ui.open({ id: PANE, title: t('paneTitle') })      // waits for a window of 144 columns or more
+    void $.ui.open({ id: PANE, title: t('paneTitle'), ...PANE_SIZE })      // waits for a window of 144 columns or more
 
     return next(e)
   })
@@ -115,7 +117,7 @@ export const register: Register = (on, options) => {
   })
 
   on('command.run', { command: COMMAND }, async $ => {
-    await $.ui.open({ id: PANE, title: t('paneTitle') })
+    await $.ui.open({ id: PANE, title: t('paneTitle'), ...PANE_SIZE })
 
     return { text: t('paneOpened') }
   })
@@ -148,8 +150,8 @@ export const register: Register = (on, options) => {
                         prompts: p.prompts, sessions: p.sessions })}
         </Text>
         {toTry.length > 0 && <Text> </Text>}
-        {toTry.length > 0 && <Text>{t('toFind')}</Text>}
-        {toTry.map(f => <Text key={f}>· {t(`ach.${f}`)}: {t(`how.${f}`)}</Text>)}
+        {toTry.length > 0 && <Text>{t('toFind')} <Text bold>{t(`ach.${toTry[0]}`)}</Text></Text>}
+        {toTry.length > 0 && <Text dimColor>{t(`how.${toTry[0]}`)}</Text>}
       </Box>
     )
   })

@@ -5,14 +5,14 @@ import { t } from '../hooks/messages'
 test('/claudou opens the pane and says so', async ($, on) => {
   const opened: string[] = []
   on('ui.open', async (_$, e) => {
-    opened.push(e.id)
+    opened.push(`${e.id} ${e.columns}x${e.rows}`)
     return { value: { isPlaced: true } }
   })
   const { text } = await $.command.run({
     command: 'claudou', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 },
   })
   expect(text).toBe(t('paneOpened'))
-  expect(opened).toEqual(['claudou'])
+  expect(opened).toEqual(['claudou 36x16'])                    // a small pane, not a third of the screen
 })
 
 for (const surface of ['terminal', 'desktop'] as const) {

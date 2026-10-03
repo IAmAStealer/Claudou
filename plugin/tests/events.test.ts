@@ -117,7 +117,8 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(drawn).toContain('Level 5 of 25')
     expect(drawn).toContain('Next: Horned ghost crab at level 7')
     expect(drawn).toContain('Delegator')
-    expect(drawn.includes('Planner:')).toBe(false)
+    expect(drawn.includes('Planner')).toBe(false)
+    expect(drawn.includes('Crab team')).toBe(false)               // one tip at a time keeps the pane small
   })
 }
 

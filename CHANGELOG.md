@@ -3,6 +3,11 @@
 Every release has a section here, written for players. CI refuses to tag a release without one
 (`python3 tools/changelog.py v1.2.3` prints the section it will publish).
 
+## v0.1.1 — 2026-10-04
+
+- The side pane is small now (36 columns, 16 rows) and shows one tip at a time instead of all eight.
+  You can still drag it bigger.
+
 ## v0.1.0 — 2026-10-04
 
 - First release: a pixel-art crab lives in a side pane of Claude Code. Open it with `/claudou`.

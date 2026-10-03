@@ -22,7 +22,7 @@ export const MESSAGES = {
     en: '{days} days · best streak {streak} · {tokens} tokens · {prompts} prompts · {sessions} sessions',
     fr: '{days} jours · meilleure série {streak} · {tokens} jetons · {prompts} messages · {sessions} sessions',
   },
-  toFind: { en: 'Claude Code features to try:', fr: 'Fonctions de Claude Code à essayer :' },
+  toFind: { en: 'Try next:', fr: 'À essayer :' },
 
   'form.crabling': { en: 'Crabling', fr: 'Crabichon' },
   'form.peaCrab': { en: 'Pea crab', fr: 'Pinnothère' },
