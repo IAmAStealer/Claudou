@@ -83,6 +83,21 @@ async function change($: EngineInterface, step: (p: Progress) => Progress): Prom
   }
 }
 
+// The pet as the store keeps it, into the session's state.
+async function restore($: EngineInterface) {
+  const stored = growth.normalize(await $.store.get(STORE_KEY))
+  await update($, progress, () => stored)
+  const isHidden = (await $.store.get(HIDDEN_KEY)) === true
+  await update($, hidden, () => isHidden)
+  const picked = await $.store.get(CHOSEN_KEY)
+  await update($, chosen, () => (typeof picked === 'string' ? picked : null))
+  const placed = await $.store.get(LAYOUT_KEY)
+  await update($, layout, () => (placed === 'vertical' ? 'vertical' : 'horizontal'))
+  const started = await $.store.get(STARTER_KEY)
+  await update($, line, () => (growth.isStarter(started) ? started : 'crab'))
+  return { stored, isHidden, placed, started }
+}
+
 const use = ($: EngineInterface, feature: Feature) => change($, p => growth.used(p, feature))
 
 export const register: Register = (on, options) => {
@@ -93,17 +108,8 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: COMMAND, description: t('commandHelp'), argumentHint: '[on|off|swap|pets|stats|help…]' })
-    const stored = growth.normalize(await $.store.get(STORE_KEY))
-    await update($, progress, () => stored)
-    const isHidden = (await $.store.get(HIDDEN_KEY)) === true
-    await update($, hidden, () => isHidden)
-    const picked = await $.store.get(CHOSEN_KEY)
-    await update($, chosen, () => (typeof picked === 'string' ? picked : null))
-    const placed = await $.store.get(LAYOUT_KEY)
-    await update($, layout, () => (placed === 'vertical' ? 'vertical' : 'horizontal'))
+    const { stored, isHidden, placed, started } = await restore($)
     if (placed === 'vertical' && !isHidden) void openPane($)
-    const started = await $.store.get(STARTER_KEY)
-    await update($, line, () => (growth.isStarter(started) ? started : 'crab'))
     const isNew = !growth.isStarter(started) && stored.days === 0 && stored.prompts === 0
     const isPlaced = placed === 'horizontal' || placed === 'vertical'
     if (e.isInteractive && (isNew || !isPlaced)) void firstStart($, isNew, isPlaced)
@@ -116,8 +122,10 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  // A new or resumed session; /clear and compaction start no new one.
+  // A new or resumed session; /clear and compaction start no new one. After a /clear or a resume the session
+  // has a new id and its state starts empty, with no session.start: the pet comes back from the store.
   on('classic.SessionStart', async ($, e, next) => {
+    if (e.source === 'clear' || e.source === 'resume') await restore($)
     if (e.source === 'startup' || e.source === 'resume') await change($, growth.startedSession)
     if (e.source === 'resume') await use($, 'burrow')
 
