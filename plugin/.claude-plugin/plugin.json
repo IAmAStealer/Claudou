@@ -1,6 +1,6 @@
 {
   "name": "claudou",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A Claude Code buddy: a pixel-art pet above your prompt that grows while you work and teaches you Claude Code",
   "keywords": [
     "claude-code",
