@@ -44,7 +44,7 @@ test('prompts on three days in a row unlock First day, 3 days and 3 days in a ro
     await clock.advance(DAY)
   }
   expect(toasts).toContain('Claudou: 3 days in a row! Your crab grows.')
-  expect(toasts).toContain('Claudou: your crab became a Boxer crab!')
+  expect(toasts).toContain('Claudou: your crab became a Pea crab!')
   expect(await pane($)).toContain('3 days · best streak 3 · 0 tokens · 3 prompts · 0 sessions')
 })
 
@@ -60,7 +60,7 @@ test('three subagents in one turn make a crab team; two then one across turns do
   await start($)
   const agent = () => $.tool.call({ tool: 'Agent', description: 'd', prompt: 'p' })
   await agent(); await agent(); await endTurn($); await agent()
-  expect(toasts).toEqual(['Claudou: Delegator! Your crab grows.', 'Claudou: your crab became a Pea crab!'])
+  expect(toasts).toEqual(['Claudou: Delegator! Your crab grows.'])
   await agent(); await agent()
   expect(toasts).toContain('Claudou: Crab team! Your crab grows.')
 })
@@ -108,12 +108,20 @@ test('tokens add up input and output of every turn, cache left out', async ($, o
   expect(await pane($)).toContain('100,000 tokens')
 })
 
+test('a first day with a feature and 100k tokens evolves the crab once, not three times', async ($, on) => {
+  const { toasts } = world(on)
+  await $.prompt.submit({ text: 'hi', wait: false, origin: { kind: 'composer' } })
+  await $.tool.call({ tool: 'ExitPlanMode' })
+  await endTurn($, { input_tokens: 60_000, output_tokens: 40_000 })
+  expect(toasts.filter(t => t.includes('became'))).toEqual(['Claudou: your crab became a Pea crab!'])
+})
+
 test('/claudou stats shows the form, the level, the next form and the achievements', async ($, on) => {
   world(on, { days: 3, bestStreak: 3, prompts: 12, features: ['planner'] })
   await start($)
   const text = await claudou($, 'stats')
-  expect(text).toContain('Fiddler crab · Level 5 of 25')         // day1, day3, streak3, prompts10, planner: level 5
-  expect(text).toContain('Next: Horned ghost crab at level 7')
+  expect(text).toContain('Hermit crab · Level 5 of 25')          // day1, day3, streak3, prompts10, planner: level 5
+  expect(text).toContain('Next: Boxer crab at level 7')
   expect(text).toContain('Achievements (5/25): Planner, First day, 3 days, 3 days in a row, 10 prompts')
 })
 

@@ -71,10 +71,11 @@ test('/claudou help, or a word it does not know, lists the commands', async ($, 
   expect(t('help')).toContain('/claudou stats')
 })
 
-const LEVEL_5 = { progress: { days: 3, bestStreak: 3, prompts: 12, features: ['planner'] } }
+// day1, day3, day7, streak3, streak7, 100k tokens, prompts10, sessions10, planner: level 9, the Fiddler crab
+const LEVEL_9 = { progress: { days: 7, bestStreak: 7, tokens: 100_000, prompts: 12, sessions: 10, features: ['planner'] } }
 
 test('/claudou pets lists the forms reached; swap shows one of them, by number or name, and comes back', async ($, on) => {
-  world(on, LEVEL_5)
+  world(on, LEVEL_9)
   await $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
   const list = await run($, 'pets')
   expect(list).toContain('Forms reached (5/11):')
@@ -91,7 +92,7 @@ test('/claudou pets lists the forms reached; swap shows one of them, by number o
 })
 
 test('the swapped form is drawn and kept for the next session', async ($, on) => {
-  world(on, { ...LEVEL_5, chosen: 'peaCrab' })
+  world(on, { ...LEVEL_9, chosen: 'peaCrab' })
   await $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
   const drawn = JSON.stringify(await (await band($, 'terminal')).drawn())
   expect(drawn.includes(SPRITES.fiddlerCrab.palette.O!)).toBe(false)

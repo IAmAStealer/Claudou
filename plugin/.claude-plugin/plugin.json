@@ -1,7 +1,7 @@
 {
   "name": "claudou",
   "version": "0.1.3",
-  "description": "A Claude Code buddy: a pixel-art pet crab above your prompt that grows while you work and teaches you Claude Code",
+  "description": "A Claude Code buddy: a pixel-art pet above your prompt that grows while you work and teaches you Claude Code",
   "keywords": [
     "claude-code",
     "buddy",
@@ -11,7 +11,6 @@
     "terminal-pet",
     "tamagotchi",
     "companion",
-    "crab",
     "pixel-art",
     "achievements",
     "learn-claude-code"
@@ -27,7 +26,7 @@
     "language": {
       "type": "string",
       "title": "Language",
-      "description": "The language your crab speaks: en (English) or fr (français)",
+      "description": "The language your pet speaks: en (English) or fr (français)",
       "default": "en",
       "options": [
         "en",

@@ -84,10 +84,10 @@ test('in French, the crab speaks French', { options: { language: 'fr' } }, async
   await $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
   const { text } = await $.command.run({ command: 'claudou', args: 'stats', origin: { kind: 'composer' },
     presentation: { isFullscreen: false, columns: 120 } })
-  expect(text).toContain('Crabe violoniste')
+  expect(text).toContain('Bernard-l\'ermite')
   expect(text).toContain('Niveau 5 sur 25')
   const drawn = JSON.stringify(await (await mount($, 'terminal')).drawn())
-  expect(drawn).toContain(SPRITES.fiddlerCrab.palette.O!)       // level 5 draws the Fiddler crab's giant claw
+  expect(drawn).toContain(SPRITES.hermitCrab.palette.S!)        // level 5 draws the Hermit crab's shell
   expect(drawn.includes(SPRITES.crabling.palette.o!)).toBe(false)
   expect((await $.command.run({ command: 'claudou', args: 'talk', origin: { kind: 'composer' },
     presentation: { isFullscreen: false, columns: 120 } })).text).toContain('Délégateur')

@@ -39,15 +39,15 @@ export const ACHIEVEMENTS: readonly Achievement[] = [...FEATURES, ...GROWTH.map(
 // The level each form starts at; the last one needs every achievement.
 export const FORMS = [
   { id: 'crabling', level: 0 },
-  { id: 'peaCrab', level: 1 },
-  { id: 'hermitCrab', level: 2 },
-  { id: 'boxerCrab', level: 3 },
-  { id: 'fiddlerCrab', level: 5 },
-  { id: 'hornedGhostCrab', level: 7 },
-  { id: 'halloweenCrab', level: 9 },
-  { id: 'coconutCrab', level: 12 },
-  { id: 'tasmanianGiantCrab', level: 15 },
-  { id: 'japaneseSpiderCrab', level: 19 },
+  { id: 'peaCrab', level: 3 },
+  { id: 'hermitCrab', level: 5 },
+  { id: 'boxerCrab', level: 7 },
+  { id: 'fiddlerCrab', level: 9 },
+  { id: 'hornedGhostCrab', level: 11 },
+  { id: 'halloweenCrab', level: 13 },
+  { id: 'coconutCrab', level: 16 },
+  { id: 'tasmanianGiantCrab', level: 19 },
+  { id: 'japaneseSpiderCrab', level: 22 },
   { id: 'crabPlanet', level: 25 },
 ] as const
 export type Form = (typeof FORMS)[number]['id']

@@ -13,14 +13,14 @@ test('25 achievements: the 8 features and 17 growth goals the owner approved', (
 })
 
 test('each form starts at its level, and the crab planet needs every achievement', () => {
-  const at = [0, 1, 2, 3, 5, 7, 9, 12, 15, 19, 25]
+  const at = [0, 3, 5, 7, 9, 11, 13, 16, 19, 22, 25]
   expect(growth.FORMS.map(f => f.level)).toEqual(at)
   for (const [i, form] of growth.FORMS.entries()) {
     expect(growth.formAt(form.level)).toBe(form.id)
     if (i > 0) expect(growth.formAt(form.level - 1)).toBe(growth.FORMS[i - 1].id)
   }
   expect(growth.FORMS[growth.FORMS.length - 1].level).toBe(growth.ACHIEVEMENTS.length)
-  expect(growth.nextForm(4)).toEqual({ id: 'fiddlerCrab', level: 5 })
+  expect(growth.nextForm(4)).toEqual({ id: 'hermitCrab', level: 5 })
   expect(growth.nextForm(25)).toBe(null)
 })
 

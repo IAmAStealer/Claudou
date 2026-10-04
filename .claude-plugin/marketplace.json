@@ -1,6 +1,6 @@
 {
   "name": "claudou",
-  "description": "Claudou: a Claude Code buddy, a pixel-art pet crab that grows while you work",
+  "description": "Claudou: a Claude Code buddy, a pixel-art pet that grows while you work",
   "owner": {
     "name": "Alexis Lefrancois",
     "url": "https://github.com/IAmAStealer"
@@ -9,7 +9,7 @@
     {
       "name": "claudou",
       "source": "./plugin",
-      "description": "A Claude Code buddy: a pixel-art pet crab above your prompt that grows while you work and teaches you Claude Code",
+      "description": "A Claude Code buddy: a pixel-art pet above your prompt that grows while you work and teaches you Claude Code",
       "keywords": [
         "claude-code",
         "buddy",
@@ -19,7 +19,6 @@
         "terminal-pet",
         "tamagotchi",
         "companion",
-        "crab",
         "pixel-art",
         "achievements",
         "learn-claude-code"
