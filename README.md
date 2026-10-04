@@ -42,7 +42,7 @@ Claude Code features you haven't tried, then everyday tricks. It speaks English 
 
 | Command | What it does |
 | --- | --- |
-| `/claudou` | show or hide your crab |
+| `/claudou` (or `help`) | the list of commands |
 | `/claudou on`, `/claudou off` | show it, hide it (also `here`, `hide`) |
 | `/claudou level` | form, level and next form, in one line |
 | `/claudou stats` | form, level, counters and achievements |

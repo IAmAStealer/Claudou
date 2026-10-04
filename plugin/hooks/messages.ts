@@ -4,12 +4,12 @@ export type Language = (typeof LANGUAGES)[number]
 
 export const MESSAGES = {
   commandHelp: {
-    en: 'Your pet: show or hide it, or ask on, off, level, stats, achievements, hint, talk, pets, swap, evolve, share, layout, config, start, reset, version, help',
-    fr: 'Ton compagnon : l\'afficher ou le cacher, ou demander on, off, level, stats, achievements, hint, talk, pets, swap, evolve, share, layout, config, start, reset, version, help',
+    en: 'Your pet: the list of commands, or on, off, level, stats, achievements, hint, talk, pets, swap, evolve, share, layout, config, start, reset, version, help',
+    fr: 'Ton compagnon : la liste des commandes, ou on, off, level, stats, achievements, hint, talk, pets, swap, evolve, share, layout, config, start, reset, version, help',
   },
   help: {
     en: [
-      '/claudou: show or hide your pet',
+      '/claudou (or help): this list',
       '/claudou on (or here), /claudou off (or hide): show it, hide it',
       '/claudou level: form, level and next form, in one line',
       '/claudou stats: level, form, counters and achievements',
@@ -27,7 +27,7 @@ export const MESSAGES = {
       '/claudou version: the version of Claudou',
     ].join('\n'),
     fr: [
-      '/claudou : afficher ou cacher ton compagnon',
+      '/claudou (ou help) : cette liste',
       '/claudou on (ou here), /claudou off (ou hide) : l\'afficher, le cacher',
       '/claudou level : forme, niveau et forme suivante, en une ligne',
       '/claudou stats : niveau, forme, compteurs et succès',

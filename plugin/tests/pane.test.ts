@@ -53,11 +53,16 @@ for (const surface of ['terminal', 'desktop'] as const) {
   })
 }
 
+test('/claudou alone lists the commands and leaves the crab as it is', async ($, on) => {
+  world(on)
+  await $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
+  expect(await run($, '')).toBe(t('help'))
+  expect(await run($, 'on')).toBe(t('shown'))
+})
+
 test('/claudou hides and shows the crab; here shows it, hide hides it, and it stays so', async ($, on) => {
   world(on)
   await $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
-  expect(await run($, '')).toBe(t('hidden'))
-  expect(await run($, '')).toBe(t('shown'))
   expect(await run($, 'hide')).toBe(t('hidden'))
   expect(await run($, 'here')).toBe(t('shown'))
   expect(await run($, 'off')).toBe(t('hidden'))

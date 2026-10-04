@@ -74,7 +74,7 @@ export const register: Register = (on, options) => {
   talkAt = FIRST_TALK
 
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: COMMAND, description: t('commandHelp') })
+    await $.command.register({ name: COMMAND, description: t('commandHelp'), argumentHint: '[on|off|swap|pets|stats|help…]' })
     const stored = growth.normalize(await $.store.get(STORE_KEY))
     await update($, progress, () => stored)
     const isHidden = (await $.store.get(HIDDEN_KEY)) === true
@@ -162,7 +162,6 @@ export const register: Register = (on, options) => {
   on('command.run', { command: COMMAND }, async ($, e) => {
     const word = e.args.trim().toLowerCase()
     const p = await read($, progress)
-    if (word === '') return { text: await show($, await read($, hidden)) }
     if (word === 'on' || word === 'here' || word === 'show') return { text: await show($, true) }
     if (word === 'hide' || word === 'off') return { text: await show($, false) }
     if (word === 'layout') return { text: await place($, await askLayout($)) }
