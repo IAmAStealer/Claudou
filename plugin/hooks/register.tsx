@@ -217,6 +217,40 @@ export const register: Register = (on, options) => {
     )
   })
 
+  // The swap picker: the forms offered, in color and numbered as the options, drawn above the engine's dialog.
+  on('ui.render', { component: 'AskUserQuestion' }, async ($, e, next) => {
+    type Question = { question?: string; options?: { label: string }[] }
+    const asked = (e.props.questions as Question[]).find(q => q?.question === t('swapQuestion'))
+    if (!asked) return next(e)
+    const { Box, Text } = $.ui.resolve(e)
+    const byName = new Map(Object.keys(SPRITES).map(id => [nameOf(id as Form), id as Form]))
+    const pose = poseAt(await read($, tick))
+    const offered = (asked.options ?? []).flatMap((o, i) => {
+      const id = byName.get(o.label)
+      return id ? [{ id, n: i + 1 }] : []
+    })
+    const fit = Math.max(1, Math.floor(((e.viewport?.columns ?? 80) + 2) / (SPRITE_COLUMNS + 5)))
+    const shownForms = offered.slice(0, fit).map(({ id, n }) => ({ n, rows: lines(SPRITES[id], pose) }))
+    const dialog = await next(e)
+    if (shownForms.length === 0) return dialog
+    // The pictures side by side in the same 6 lines (the engine keeps 6 around its dialog), each after its
+    // option's number.
+    return (
+      <Box flexDirection="column">
+        {shownForms[0]!.rows.map((_, r) => (
+          <Text key={`pick${r}`}>
+            {shownForms.flatMap(({ n, rows }, i) => [
+              <Text key={`n${r}.${i}`}>{r === 0 ? `${n}. ` : '   '}</Text>,
+              ...rows[r]!.map((run, c) => <Text key={`${r}.${i}.${c}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>),
+              <Text key={`gap${r}.${i}`}>{'  '}</Text>,
+            ])}
+          </Text>
+        ))}
+        {dialog}
+      </Box>
+    )
+  })
+
   // Vertical: a narrow column beside the conversation. Docked, the column is as tall as the screen: the crab
   // sits at its bottom, near the prompt, and what it says above it.
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {

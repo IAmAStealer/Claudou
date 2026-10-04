@@ -52,6 +52,24 @@ test('/claudou swap alone offers the newest four forms reached, and takes the on
   expect(await run($, 'pets')).toContain('▸ 3. Hermit crab')
 })
 
+for (const surface of ['terminal', 'desktop'] as const) {
+  test(`the swap picker shows the forms offered in color above the dialog, numbered as the options; other questions are left alone, on ${surface}`, async ($, on) => {
+    world(on, LEVEL_9)
+    on('ui.render', { component: 'AskUserQuestion' }, async () => ({ type: 'engine', ref: 0 }) as never)   // the engine's dialog
+    await start($)
+    const dialog = (question: string) => $.ui.mount({ plugin: 'claudou', surface, component: 'AskUserQuestion',
+      props: { tool: 'AskUserQuestion', questions: [{ question, header: 'Claudou', multiSelect: false,
+        options: [{ label: 'Fiddler crab', description: '' }, { label: 'Pea crab', description: '' }] }] } as never })
+    const swap = JSON.stringify(await (await dialog(t('swapQuestion'))).drawn())
+    for (const s of [SPRITES.fiddlerCrab!, SPRITES.peaCrab!])
+      for (const letter of new Set(s.base.join('').replace(/\./g, ''))) expect(swap).toContain(s.palette[letter]!)
+    expect(swap).toContain('"1. "')
+    expect(swap).toContain('"2. "')
+    expect(swap).toContain('"engine"')
+    expect(await (await dialog('Which one?')).drawn()).toEqual({ type: 'engine', ref: 0 } as never)
+  })
+}
+
 test('/claudou swap alone takes a number or name typed under Other', async ($, on) => {
   world(on, LEVEL_9, () => '1')
   await start($)
