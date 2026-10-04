@@ -3,6 +3,10 @@
 Every release has a section here, written for players. CI refuses to tag a release without one
 (`python3 tools/changelog.py v1.2.3` prints the section it will publish).
 
+## v0.1.5 — 2026-10-04
+
+- In the side column, your pet now sits at the bottom, near the prompt, with its speech bubble above it.
+
 ## v0.1.4 — 2026-10-04
 
 - Choose your pet: the crab or one of Bashou's three starters (Star, Sprout, Pebble). New players are asked at
