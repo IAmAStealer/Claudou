@@ -86,6 +86,8 @@ test('in French, the crab speaks French', { options: { language: 'fr' } }, async
     presentation: { isFullscreen: false, columns: 120 } })
   expect(text).toContain('Bernard-l\'ermite')
   expect(text).toContain('Niveau 5 sur 25')
+  expect((await $.command.run({ command: 'claudou', args: 'config', origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 120 } })).text).toContain('Langue : français')
   const drawn = JSON.stringify(await (await mount($, 'terminal')).drawn())
   expect(drawn).toContain(SPRITES.hermitCrab.palette.S!)        // level 5 draws the Hermit crab's shell
   expect(drawn.includes(SPRITES.crabling.palette.o!)).toBe(false)

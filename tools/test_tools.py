@@ -18,6 +18,13 @@ class ChangelogTest(unittest.TestCase):
         self.assertEqual(changelog.notes("v0.3.0", text), "")
 
 
+class VersionTest(unittest.TestCase):
+    def test_the_version_players_see_is_the_plugin_version(self):
+        root = Path(__file__).resolve().parent.parent
+        manifest = json.loads((root / "plugin/.claude-plugin/plugin.json").read_text())
+        self.assertIn(f"export const VERSION = '{manifest['version']}'", (root / "plugin/hooks/version.ts").read_text())
+
+
 class CapabilitiesTest(unittest.TestCase):
     REPORT = ("  ❯ ./register.tsx hooks: session.start, command.run{command=claudou}, ui.render{component=Pane, requestId=claudou}\n"
               "  ❯ ./register.tsx calls: $.command.register, $.store.set (via change, choose), $.ui.resolve\n")

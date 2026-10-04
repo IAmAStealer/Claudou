@@ -37,13 +37,20 @@ Claude Code features you haven't tried, then everyday tricks. It speaks English 
 | Command | What it does |
 | --- | --- |
 | `/claudou` | show or hide your crab |
+| `/claudou on`, `/claudou off` | show it, hide it (also `here`, `hide`) |
+| `/claudou level` | form, level and next form, in one line |
+| `/claudou stats` | form, level, counters and achievements |
+| `/claudou achievements` | all 25 achievements, and how to get the missing ones |
 | `/claudou hint` | the next Claude Code feature to try, and how |
 | `/claudou talk` | your crab gives you a tip now |
-| `/claudou stats` | form, level, counters and achievements |
 | `/claudou pets` | the forms your crab reached |
-| `/claudou swap <form>` | show another form you reached, by number or name (`swap` alone: the newest) |
-| `/claudou on`, `/claudou off` | show it, hide it (also `here`, `hide`) |
+| `/claudou swap` | pick another form you reached (`swap <name or number>` directly, `swap new` for the newest) |
+| `/claudou evolve` | watch your crab grow through every form it reached |
+| `/claudou share` | a card to copy and share |
 | `/claudou layout horizontal`, `/claudou layout vertical` | above the prompt, or in a column beside the conversation (asked once at first start; `layout` alone asks again) |
+| `/claudou config` | your settings and where to change them |
+| `/claudou reset` | start over with a Crabling (asks first) |
+| `/claudou version` | the version of Claudou |
 
 To update: `/plugin marketplace update claudou`, then `/plugin update claudou@claudou`.
 

@@ -7,6 +7,7 @@ import { LANGUAGES, MESSAGES, t as translate } from './messages'
 import type { Language, MessageId } from './messages'
 import { lines, poseAt, TICK_MS } from './sprite'
 import { SPRITES } from './sprites'
+import { VERSION } from './version'
 
 export const COMMAND = 'claudou'
 export const STORE_KEY = 'progress'
@@ -29,6 +30,7 @@ const chosen = atom({ plugin: 'claudou', key: 'chosen' } as const, null as strin
 const bubble = atom({ plugin: 'claudou', key: 'bubble' } as const, null as string | null)   // what the crab says
 const layout = atom({ plugin: 'claudou', key: 'layout' } as const, 'horizontal' as Layout)  // band or side pane
 type Layout = 'horizontal' | 'vertical'
+const parade = atom({ plugin: 'claudou', key: 'parade' } as const, null as string | null)  // the form /claudou evolve shows
 
 // The player's language, from the mod's settings (/config): English unless they chose French.
 let language: Language = 'en'
@@ -38,6 +40,7 @@ let ticks = 0
 let talkAt = FIRST_TALK
 let quietAt = 0                                  // when the bubble goes, in ms; 0 with none
 let tipsSaid = 0
+let paradeLeft: Form[] = []                      // the forms /claudou evolve has still to show, one per tick
 
 // Subagents the main loop started in the turn under way (Crab team: 3 in one turn).
 let agentsThisTurn = 0
@@ -157,10 +160,18 @@ export const register: Register = (on, options) => {
       return { text: l ? await place($, l) : t('layoutUnknown') }
     }
     if (word === 'hint') return { text: hint(p) }
+    if (word === 'level') return { text: levelLine(p) }
     if (word === 'stats') return { text: stats(p) }
+    if (word === 'achievements') return { text: achievements(p) }
     if (word === 'talk') return { text: await say($, nextTip(p)) }
     if (word === 'pets') return { text: pets(p, await shown($)) }
-    if (word === 'swap' || word.startsWith('swap ')) return { text: await swap($, p, word.slice(4).trim()) }
+    if (word === 'swap') return { text: await pick($, p) }
+    if (word.startsWith('swap ')) return { text: await swap($, p, word.slice(5).trim()) }
+    if (word === 'evolve') return { text: await evolve($, p) }
+    if (word === 'share') return { text: share(p) }
+    if (word === 'config') return { text: config(await read($, layout)) }
+    if (word === 'reset') return { text: await reset($) }
+    if (word === 'version') return { text: t('version', { version: VERSION }) }
 
     return { text: t('help') }
   })
@@ -250,6 +261,10 @@ async function place($: EngineInterface, l: Layout): Promise<string> {
 async function beat($: EngineInterface): Promise<void> {
   ticks += 1
   await update($, tick, n => n + 1)
+  if (paradeLeft.length > 0 || (await read($, parade)) !== null) {
+    const next = paradeLeft.shift() ?? null
+    await update($, parade, () => next)
+  }
   if (ticks >= talkAt) {
     talkAt = ticks + TALK_EVERY
     await say($, nextTip(await read($, progress)))
@@ -277,6 +292,9 @@ function nextTip(p: Progress): string {
 
 // The form on screen: the one picked by swap while the crab has reached it, otherwise the newest.
 async function shown($: EngineInterface): Promise<Form> {
+  const walking = await read($, parade)
+  const showing = growth.FORMS.find(f => f.id === walking)
+  if (showing) return showing.id
   const lvl = growth.level(await read($, progress))
   const id = await read($, chosen)
   const picked = growth.FORMS.find(f => f.id === id)
@@ -303,7 +321,7 @@ function findForm(name: string): (typeof growth.FORMS)[number] | undefined {
 
 async function swap($: EngineInterface, p: Progress, name: string): Promise<string> {
   const lvl = growth.level(p)
-  if (name === '') {
+  if (name === 'new' || name === 'newest') {
     await choose($, null)
     return t('swapNewest', { form: t(`form.${growth.formAt(lvl)}`) })
   }
@@ -354,4 +372,62 @@ function stats(p: Progress): string {
                  sessions: p.sessions }),
     `${t('achievements', { n: done.length, max: growth.ACHIEVEMENTS.length })} ${done.map(a => t(`ach.${a}`)).join(', ')}`,
   ].join('\n')
+}
+
+// /claudou swap alone: a picker of the forms reached, newest first (4 at most; "Other" takes a name or number).
+async function pick($: EngineInterface, p: Progress): Promise<string> {
+  const reached = growth.FORMS.filter(f => growth.level(p) >= f.level).reverse()
+  if (reached.length === 1) return t('swapOnlyOne', { form: t(`form.${reached[0]!.id}`) })
+  const options = reached.slice(0, 4).map(f => t(`form.${f.id}`))
+  const answer = await $.ui.ask(t('swapQuestion'), { options, header: 'Claudou' }).catch(() => null)
+  if (answer === null || answer.trim() === '') return t('swapKept', { form: t(`form.${await shown($)}`) })
+  return swap($, p, answer.trim())
+}
+
+function levelLine(p: Progress): string {
+  const lvl = growth.level(p)
+  const next = growth.nextForm(lvl)
+  return [t(`form.${growth.formAt(lvl)}`), t('level', { n: lvl, max: growth.ACHIEVEMENTS.length }),
+          ...(next ? [t('nextForm', { form: t(`form.${next.id}`), n: next.level })] : [])].join(' · ')
+}
+
+// Every achievement: earned ones ticked, the features with how to find them, the goals with how far along.
+function achievements(p: Progress): string {
+  const done = growth.achieved(p)
+  const features = growth.FEATURES.map(f =>
+    done.includes(f) ? `✓ ${t(`ach.${f}`)}` : `· ${t(`ach.${f}`)}: ${t(`how.${f}`)}`)
+  const goals = growth.GROWTH.map(g => done.includes(g.id) ? `✓ ${t(`ach.${g.id}`)}`
+    : `· ${t(`ach.${g.id}`)} (${p[g.counter].toLocaleString(language)}/${g.goal.toLocaleString(language)})`)
+  return [t('achievements', { n: done.length, max: growth.ACHIEVEMENTS.length }), ...features, ...goals].join('\n')
+}
+
+// The crab walks through every form it reached, one per tick, and comes back to the one it shows.
+async function evolve($: EngineInterface, p: Progress): Promise<string> {
+  if (await read($, hidden)) return t('evolveHidden')
+  const reached = growth.FORMS.filter(f => growth.level(p) >= f.level).map(f => f.id)
+  paradeLeft = reached.slice(1)
+  await update($, parade, () => reached[0]!)
+  return t('evolve', { forms: reached.map(f => t(`form.${f}`)).join(' → ') })
+}
+
+function share(p: Progress): string {
+  const lvl = growth.level(p)
+  return [t('shareIntro'), '', t('shareCard', { form: t(`form.${growth.formAt(lvl)}`), n: lvl,
+    max: growth.ACHIEVEMENTS.length, done: growth.achieved(p).length, days: p.days, streak: p.bestStreak })].join('\n')
+}
+
+function config(l: Layout): string {
+  return t('config', { language: t(`languageName.${language}`), layout: t(`layoutName.${l}`) })
+}
+
+// Starts over after the person confirms: a Crabling again, no achievement, no swapped form.
+async function reset($: EngineInterface): Promise<string> {
+  const options = [t('resetYes'), t('resetNo')]
+  const answer = await $.ui.ask(t('resetQuestion'), { options, header: 'Claudou' }).catch(() => null)
+  if (answer !== options[0]) return t('resetKept')
+  const fresh = growth.fresh()
+  await $.store.set(STORE_KEY, fresh)
+  await update($, progress, () => fresh)
+  await choose($, null)
+  return t('resetDone')
 }

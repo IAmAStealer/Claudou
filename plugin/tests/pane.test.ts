@@ -88,7 +88,7 @@ test('/claudou pets lists the forms reached; swap shows one of them, by number o
   expect(await run($, 'swap planet')).toBe('Crab planet comes at level 25. Keep using Claude Code to get there.')
   expect(await run($, 'swap lobster')).toBe('No form called "lobster". /claudou pets lists them.')
   await run($, 'swap 1')
-  expect(await run($, 'swap')).toBe('Your crab shows its newest form: Fiddler crab.')
+  expect(await run($, 'swap new')).toBe('Your crab shows its newest form: Fiddler crab.')
 })
 
 test('the swapped form is drawn and kept for the next session', async ($, on) => {
