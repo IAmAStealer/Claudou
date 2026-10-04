@@ -517,17 +517,24 @@ function stats(p: Progress, l: Starter): string {
   ].join('\n')
 }
 
-// /claudou swap alone: a picker of the forms reached, newest first, then the pets found (4 at most; "Other"
-// takes a name or number).
+// /claudou swap alone: a picker of the forms reached, newest first, then the pets found. The dialog takes 4
+// options: beyond 4 pets, pages of 3 and a "More pets" option that turns to the next page, back to the first after
+// the last. "Other" takes a name or number.
 async function pick($: EngineInterface): Promise<string> {
   const { reached, others } = await choices($)
   const all = [...[...reached].reverse(), ...others]
   if (all.length === 1) return t('swapOnlyOne', { form: nameOf(all[0]!) })
-  const options = all.slice(0, 4).map(nameOf)
-  const answer = await $.ui.ask(t('swapQuestion'), { options, header: 'Claudou' }).catch(() => null)
-  if (answer === null || answer.trim() === '') return t('swapKept', { form: nameOf(await shown($)) })
-  const exact = all.find(id => nameOf(id) === answer)
-  return swap($, exact ?? answer.trim())
+  const size = all.length > 4 ? 3 : 4
+  const pages = Math.ceil(all.length / size)
+  for (let page = 0; ; page = (page + 1) % pages) {
+    const more = t('swapMore', { page: page + 1, pages })
+    const options = [...all.slice(page * size, page * size + size).map(nameOf), ...(pages > 1 ? [more] : [])]
+    const answer = await $.ui.ask(t('swapQuestion'), { options, header: 'Claudou' }).catch(() => null)
+    if (answer === null || answer.trim() === '') return t('swapKept', { form: nameOf(await shown($)) })
+    if (answer === more) continue
+    const exact = all.find(id => nameOf(id) === answer)
+    return swap($, exact ?? answer.trim())
+  }
 }
 
 function levelLine(p: Progress, l: Starter): string {

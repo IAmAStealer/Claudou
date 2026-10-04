@@ -70,6 +70,7 @@ export const MESSAGES = {
     en: 'Your pet has only one form so far: {form}. It grows as you use Claude Code.',
     fr: 'Ton compagnon n\'a qu\'une forme pour l\'instant : {form}. Il grandit quand tu utilises Claude Code.',
   },
+  swapMore: { en: 'More pets… ({page}/{pages})', fr: 'Autres compagnons… ({page}/{pages})' },
   swapKept: { en: 'Your pet stays a {form}.', fr: 'Ton compagnon reste {form}.' },
   evolve: { en: 'Watch your pet grow: {forms}', fr: 'Regarde ton compagnon grandir : {forms}' },
   evolveHidden: {

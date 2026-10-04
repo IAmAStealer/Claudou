@@ -44,11 +44,11 @@ const LEVEL_9 = { progress: { days: 7, bestStreak: 7, tokens: 100_000, prompts: 
 const ALL = { progress: { days: 100, bestStreak: 30, tokens: 100_000_000, prompts: 1000, sessions: 100,
                           features: [...growth.FEATURES] } }
 
-test('/claudou swap alone offers the newest four forms reached, and takes the one picked', async ($, on) => {
+test('/claudou swap alone offers the newest forms reached, and takes the one picked', async ($, on) => {
   const { asked } = world(on, LEVEL_9, options => options[2]!)
   await start($)
   expect(await run($, 'swap')).toBe('Your pet is now a Hermit crab.')
-  expect(asked).toEqual([['Fiddler crab', 'Boxer crab', 'Hermit crab', 'Pea crab']])
+  expect(asked).toEqual([['Fiddler crab', 'Boxer crab', 'Hermit crab', t('swapMore', 'en', { page: 1, pages: 2 })]])
   expect(await run($, 'pets')).toContain('▸ 3. Hermit crab')
 })
 
@@ -69,6 +69,28 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(await (await dialog('Which one?')).drawn()).toEqual({ type: 'engine', ref: 0 } as never)
   })
 }
+
+test('/claudou swap alone with more than four pets pages through them all, back to the first page after the last', async ($, on) => {
+  const seen: string[][] = []
+  const { asked } = world(on, ALL, options => {
+    const back = seen.length > 0 && JSON.stringify(options) === JSON.stringify(seen[0])
+    seen.push(options)
+    return back ? options[0]! : options[options.length - 1]!
+  })
+  await start($)
+  expect(await run($, 'swap')).toBe(`Your pet is now a ${asked[0]![0]}.`)
+  const n = asked.length - 1
+  const all = (await run($, 'pets')).split('\n').filter(l => /^[ ▸] +\d+\. /.test(l)).length
+  expect(all).toBe(growth.forms('crab').length + growth.FEATURES.length)
+  expect(n).toBe(Math.ceil(all / 3))
+  for (const [i, options] of asked.entries()) {
+    expect(options.length).toBeLessThanOrEqual(4)
+    expect(options[options.length - 1]).toBe(t('swapMore', 'en', { page: (i % n) + 1, pages: n }))
+  }
+  const offered = new Set(asked.slice(0, n).flatMap(o => o.slice(0, -1)))
+  expect(offered.size).toBe(all)
+  expect(asked[n]).toEqual(asked[0])
+})
 
 test('/claudou swap alone takes a number or name typed under Other', async ($, on) => {
   world(on, LEVEL_9, () => '1')
