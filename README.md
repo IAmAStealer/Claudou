@@ -29,6 +29,9 @@ Each Claude Code feature also brings a pet to collect, which grows the more you 
 plan mode, an Ant for subagents, an Octopus for three at once, a Bee for skills, a Squirrel for `/compact`, a
 Turtle for memory files, a Spider for MCP tools, a Pigeon for resumed sessions. `/claudou swap` shows any of them.
 
+Your pet reacts to what Claude does: a ✦ when tests pass, a ! when a command fails, a ♪ when a long turn ends,
+and z z when nothing has happened for a while.
+
 Also playing Bashou? `/claudou swap` can show the pets you unlocked there.
 
 ## Install

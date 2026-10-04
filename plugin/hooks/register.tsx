@@ -23,6 +23,20 @@ export const PANE_COLUMNS = 26                   // the vertical column: the cra
 export const FIRST_TALK = 250                    // ticks: the crab first speaks after 5 minutes,
 export const TALK_EVERY = 750                    // then every 15 minutes,
 export const BUBBLE_MS = 10_000                  // and its bubble stays 10 seconds, by the clock
+export const REACT_MS = 4000                     // a reaction beside the pet stays 4 seconds,
+export const IDLE_MS = 300_000                   // it falls asleep after 5 minutes with nothing going on,
+export const LONG_TURN_MS = 60_000               // and a turn of a minute or more ends with a ♪
+
+// The reactions, Bashou's particles: rows of a 3-cell column on the pet's left, and their color.
+type Reaction = 'pass' | 'fail' | 'done' | 'idle'
+const REACTIONS: Record<Reaction, { rows: string[]; color: string }> = {
+  pass: { rows: [' ✦ '], color: '#ffd060' },
+  fail: { rows: [' ! '], color: '#e05a4a' },
+  done: { rows: [' ♪ '], color: '#7ab8f0' },
+  idle: { rows: ['  z', ' z '], color: '#a0a4b0' },
+}
+// A command that runs tests: npm test, cargo test, pytest, go test, python -m unittest…
+const TEST_COMMAND = /\b(test|tests|pytest|jest|vitest|unittest|rspec|phpunit|ctest)\b/
 export const TIPS = ['clear', 'mention', 'rewind', 'init', 'bang', 'context', 'model', 'escape'] as const
 
 const progress = atom({ plugin: 'claudou', key: 'progress' } as const, growth.fresh())
@@ -35,6 +49,7 @@ type Layout = 'horizontal' | 'vertical'
 const parade = atom({ plugin: 'claudou', key: 'parade' } as const, null as string | null)  // the form /claudou evolve shows
 const line = atom({ plugin: 'claudou', key: 'starter' } as const, 'crab' as Starter)         // the pet's line
 const bashou = atom({ plugin: 'claudou', key: 'bashou' } as const, [] as string[])          // Bashou pets one may show
+const reaction = atom({ plugin: 'claudou', key: 'reaction' } as const, null as Reaction | null)  // beside the pet
 
 // The player's language, from the mod's settings (/config): English unless they chose French.
 let language: Language = 'en'
@@ -43,6 +58,8 @@ let ticking = false
 let ticks = 0
 let talkAt = FIRST_TALK
 let quietAt = 0                                  // when the bubble goes, in ms; 0 with none
+let calmAt = 0                                   // when the reaction goes, in ms; 0 while asleep or with none
+let activeAt = 0                                 // the last time something happened, in ms
 let tipsSaid = 0
 let paradeLeft: Form[] = []                      // the forms /claudou evolve has still to show, one per tick
 
@@ -93,6 +110,7 @@ export const register: Register = (on, options) => {
     if (e.isInteractive && (isNew || !isPlaced)) void firstStart($, isNew, isPlaced)
     await update($, bashou, () => [])
     void bashouPets($).then(found => update($, bashou, () => found)).catch(() => undefined)
+    activeAt = await $.clock.now()
     if (!ticking) {
       ticking = true
       $.clock.every(TICK_MS, () => void beat($))
@@ -114,14 +132,20 @@ export const register: Register = (on, options) => {
     if (e.origin.kind !== 'composer' && e.origin.kind !== 'bridge') return next(e)
     const day = growth.dayOf(await $.clock.now())
     await change($, p => growth.prompted(p, day))
+    await wake($)
 
     return next(e)
   })
 
   on('tool.call', async ($, e, next) => {
     const done = await next(e)
-    if (done.isError || 'deny' in done) return done
     const tool: string = e.tool
+    await wake($)
+    if (tool === 'Bash' && !e.agentId && !('deny' in done)) {
+      if (done.isError) await react($, 'fail')
+      else if (TEST_COMMAND.test(String((e as { command?: unknown }).command ?? ''))) await react($, 'pass')
+    }
+    if (done.isError || 'deny' in done) return done
     if (tool === 'ExitPlanMode') await use($, 'planner')
     if (tool === 'Agent' && !e.agentId) {
       agentsThisTurn += 1
@@ -157,6 +181,8 @@ export const register: Register = (on, options) => {
       await change($, p => growth.usedTokens(p, usage))
     }
     if (!e.agentId) agentsThisTurn = 0
+    await wake($)
+    if (!e.agentId && !e.isAborted && e.durationMs >= LONG_TURN_MS) await react($, 'done')
 
     return next(e)
   })
@@ -198,6 +224,7 @@ export const register: Register = (on, options) => {
     const form = await shown($)
     const pose = poseAt(await read($, tick))
     const said = await read($, bubble)
+    const mood = await read($, reaction)
     const width = Math.min(48, room - 1)
 
     return (
@@ -207,12 +234,15 @@ export const register: Register = (on, options) => {
             <Text wrap="wrap">{said}</Text>
           </Box>
         ) : null}
-        <Box flexDirection="column">
-          {lines(SPRITES[form], pose).map((runs, r) => (
-            <Box key={`sprite${r}`} flexDirection="row">
-              {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
-            </Box>
-          ))}
+        <Box flexDirection="row">
+          {mood ? moodColumn({ Box, Text }, mood) : null}
+          <Box flexDirection="column">
+            {lines(SPRITES[form], pose).map((runs, r) => (
+              <Box key={`sprite${r}`} flexDirection="row">
+                {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Box>
     )
@@ -259,6 +289,7 @@ export const register: Register = (on, options) => {
     const form = await shown($)
     const pose = poseAt(await read($, tick))
     const said = await read($, bubble)
+    const mood = await read($, reaction)
     const docked = e.props.placement === 'dock'
 
     return (
@@ -269,12 +300,15 @@ export const register: Register = (on, options) => {
             <Text wrap="wrap">{said}</Text>
           </Box>
         ) : null}
-        <Box key="sprite" flexDirection="column">
-          {lines(SPRITES[form], pose).map((runs, r) => (
-            <Box key={`sprite${r}`} flexDirection="row">
-              {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
-            </Box>
-          ))}
+        <Box key="sprite" flexDirection="row">
+          {mood ? moodColumn({ Box, Text }, mood) : null}
+          <Box flexDirection="column">
+            {lines(SPRITES[form], pose).map((runs, r) => (
+              <Box key={`sprite${r}`} flexDirection="row">
+                {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Box>
     )
@@ -322,6 +356,32 @@ async function beat($: EngineInterface): Promise<void> {
     quietAt = 0
     await update($, bubble, () => null)
   }
+  const now = await $.clock.now()
+  if (calmAt !== 0 && now >= calmAt) {
+    calmAt = 0
+    await update($, reaction, () => null)
+  }
+  if ((await read($, reaction)) === null && now - activeAt >= IDLE_MS) await update($, reaction, () => 'idle')
+}
+
+// The reaction's column on the pet's left: its symbol on the top rows.
+function moodColumn({ Box, Text }: Pick<ReturnType<EngineInterface['ui']['resolve']>, 'Box' | 'Text'>, r: Reaction) {
+  return (
+    <Box key="mood" flexDirection="column" width={3}>
+      {REACTIONS[r].rows.map((row, i) => <Text key={`mood${i}`} color={REACTIONS[r].color}>{row}</Text>)}
+    </Box>
+  )
+}
+
+// Something happened: the pet wakes up if it slept.
+async function wake($: EngineInterface): Promise<void> {
+  activeAt = await $.clock.now()
+  if ((await read($, reaction)) === 'idle') await update($, reaction, () => null)
+}
+
+async function react($: EngineInterface, r: Reaction): Promise<void> {
+  calmAt = (await $.clock.now()) + REACT_MS
+  await update($, reaction, () => r)
 }
 
 async function say($: EngineInterface, text: string): Promise<string> {
