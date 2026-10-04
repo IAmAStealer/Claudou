@@ -7,10 +7,12 @@ export type Sprite = {
   poses: Record<string, Record<string, string>>     // row index -> row painted over base, '-' keeps the pixel
 }
 
-// The order the poses come in, one step per tick: mostly still, breathing, a blink, a look around, a fidget.
+// The order the poses come in, one step per tick: mostly still (a move every 6 seconds or so), breathing, a
+// blink, a look around, a fidget.
 export const SEQUENCE = [
-  'base', 'base', 'inhale', 'base', 'base', 'base', 'closed', 'base',
-  'left', 'base', 'right', 'base', 'inhale', 'base', 'base', 'fidget',
+  'base', 'base', 'base', 'base', 'inhale', 'base', 'base', 'base', 'base', 'base', 'closed', 'base',
+  'base', 'base', 'base', 'left', 'base', 'right', 'base', 'base', 'base', 'base', 'base', 'inhale',
+  'base', 'base', 'base', 'base', 'base', 'base', 'base', 'fidget',
 ] as const
 export const TICK_MS = 1200
 
