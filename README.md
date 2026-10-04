@@ -5,8 +5,10 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/IAmAStealer/Claudou/badge)](https://scorecard.dev/viewer/?uri=github.com/IAmAStealer/Claudou)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A little pixel-art pet that sits above the prompt of [Claude Code](https://claude.com/claude-code) and grows
-while you work with it.
+A Claude Code buddy: a little pixel-art pet crab that sits above the prompt of
+[Claude Code](https://claude.com/claude-code), grows while you work with it, and teaches you Claude Code.
+A virtual pet (tamagotchi-style terminal companion) installed as a plain Claude Code plugin, an alternative to
+the `/buddy` companion that Claude Code no longer ships.
 
 It grows with **25 achievements**, one level each:
 
