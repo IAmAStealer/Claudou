@@ -36,7 +36,7 @@ const run = async ($: Engine, args: string) => (await $.command.run({
 
 const start = ($: Engine) => $.session.start({ cwd: '/r', surface: 'terminal', isInteractive: true })
 
-const band = ($: Engine) => $.ui.mount({ plugin: 'claudou', surface: 'terminal', component: 'AbovePrompt',
+const band = ($: Engine, surface: 'terminal' | 'desktop' = 'terminal') => $.ui.mount({ plugin: 'claudou', surface, component: 'AbovePrompt',
   props: { hasSurvey: false, isWorking: false, maxRows: 20, bodyColumns: 80, scroll: { offset: 0, bodyRows: 20 } } as never })
 
 // day1, day3, day7, streak3, streak7, 100k tokens, prompts10, sessions10, planner: level 9, the Fiddler crab
@@ -138,18 +138,60 @@ test('/claudou achievements lists all 25: earned ones ticked, features with how,
   expect(lines.filter(l => l.startsWith('✓ ')).length).toBe(9)
 })
 
-test('/claudou evolve walks the crab through every form it reached, one per tick, and back', async ($, on) => {
+const GLOW = '#ebebf5'
+
+// Moves the clock 100 ms at a time until the band shows `wanted`; what it drew on the way, in order.
+async function until(clock: { advance: (ms: number) => Promise<void> }, drawn: () => Promise<string>, wanted: string) {
+  const seen: string[] = []
+  for (let ms = 0; ms < 60_000 && !seen.at(-1)?.includes(wanted); ms += 100) {
+    await clock.advance(100)
+    seen.push(await drawn())
+  }
+  expect(seen.at(-1)).toContain(wanted)
+  return seen
+}
+
+test('/claudou evolve plays each evolution as in Bashou: white shapes, faster and faster, then sparkles, and back', async ($, on) => {
   const { clock } = world(on, LEVEL_9)
   await start($)
   const mounted = await band($)
+  const drawn = async () => JSON.stringify(await mounted.drawn())
   expect(await run($, 'evolve')).toBe('Watch your pet grow: Crabling → Pea crab → Hermit crab → Boxer crab → Fiddler crab')
-  expect(JSON.stringify(await mounted.drawn())).toContain(SPRITES.crabling.palette.o!)
-  await clock.advance(TICK_MS)
-  expect(JSON.stringify(await mounted.drawn())).not.toContain(SPRITES.crabling.palette.o!)
-  for (let i = 0; i < 5; i++) await clock.advance(TICK_MS)
-  const after = JSON.stringify(await mounted.drawn())
+  expect(await drawn()).toContain(SPRITES.crabling.palette.o!)
+  expect(await drawn()).toContain('What? Crabling is evolving!')
+  const glowing = await until(clock, drawn, GLOW)
+  expect(glowing.at(-1)).not.toContain(SPRITES.crabling.palette.o!)
+  const frames = await until(clock, drawn, 'Crabling evolved into Pea crab!')
+  const shapes = frames.filter((f, i) => f.includes(GLOW) && f !== frames[i - 1]).length
+  expect(shapes).toBeGreaterThanOrEqual(10)                          // old and new shapes, back and forth
+  const sparkled = frames.at(-1)!
+  expect(sparkled).toContain(SPRITES.peaCrab.palette[Object.keys(SPRITES.peaCrab.palette)[0]!]!)
+  expect(sparkled).not.toContain(GLOW)
+  expect(sparkled).toContain(' ✦ ')
+  await until(clock, drawn, 'Boxer crab evolved into Fiddler crab!')
+  for (let i = 0; i < 20; i++) await clock.advance(100)
+  const after = await drawn()
   expect(after).toContain(SPRITES.fiddlerCrab.palette.O!)
+  expect(after).not.toContain(GLOW)
   expect(await run($, 'pets')).toContain('▸ 5. Fiddler crab')
+})
+
+for (const surface of ['terminal', 'desktop'] as const)
+test(`a pet that evolves for real plays its evolution, and stays the new form, on ${surface}`, async ($, on) => {
+  const { clock } = world(on, { progress: { features: growth.FEATURES.slice(0, 2), tokens: 99_000 } })
+  on('turn.complete', async (_$, e) => ({ text: e.answer }))
+  await start($)
+  const mounted = await band($, surface)
+  const drawn = async () => JSON.stringify(await mounted.drawn())
+  await $.turn.complete({ answer: 'a', durationMs: 1, isAborted: false, turnId: 't', reason: 'answer',
+    usage: { input_tokens: 600, output_tokens: 400, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, model: 'm' } })
+  expect(await drawn()).toContain('What? Crabling is evolving!')
+  expect(await drawn()).toContain(SPRITES.crabling.palette.o!)
+  await until(clock, drawn, GLOW)
+  await until(clock, drawn, 'Crabling evolved into Pea crab!')
+  for (let i = 0; i < 20; i++) await clock.advance(100)
+  expect(await drawn()).not.toContain(GLOW)
+  expect(await run($, 'pets')).toContain('▸ 2. Pea crab')
 })
 
 test('/claudou evolve while hidden asks to show the crab first', async ($, on) => {

@@ -73,6 +73,8 @@ export const MESSAGES = {
   swapMore: { en: 'More pets… ({page}/{pages})', fr: 'Autres compagnons… ({page}/{pages})' },
   swapKept: { en: 'Your pet stays a {form}.', fr: 'Ton compagnon reste {form}.' },
   evolve: { en: 'Watch your pet grow: {forms}', fr: 'Regarde ton compagnon grandir : {forms}' },
+  evolving: { en: 'What? {name} is evolving!', fr: 'Quoi ? {name} évolue !' },
+  evolved: { en: '✦ {old} evolved into {form}! ✦', fr: '✦ {old} est devenu {form} ! ✦' },
   evolveHidden: {
     en: 'Your pet is hiding: /claudou on, then /claudou evolve.',
     fr: 'Ton compagnon se cache : /claudou on, puis /claudou evolve.',

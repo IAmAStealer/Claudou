@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register } from 'claude-code'
+import type { EngineInterface, Register, Timer } from 'claude-code'
 
 import * as growth from './growth'
 import type { CrabForm, Feature, Form, Progress, Starter } from './growth'
@@ -7,6 +7,7 @@ import { BASHOU_FAMILIES, BASHOU_NAMES } from './bashou'
 import { LANGUAGES, MESSAGES, t as translate } from './messages'
 import type { Language, MessageId } from './messages'
 import { lines, poseAt, TICK_MS } from './sprite'
+import type { Sprite } from './sprite'
 import { SPRITES } from './sprites'
 import { VERSION } from './version'
 
@@ -27,6 +28,8 @@ export const REACT_MS = 4000                     // a reaction beside the pet st
 export const IDLE_MS = 300_000                   // it falls asleep after 5 minutes with nothing going on,
 export const LONG_TURN_MS = 60_000               // and a turn of a minute or more ends with a ♪
 
+const GLOW = '#ebebf5'                           // an evolving pet's white
+
 // The reactions, Bashou's particles: rows of a 3-cell column on the pet's left, and their color.
 type Reaction = 'pass' | 'fail' | 'done' | 'idle'
 const REACTIONS: Record<Reaction, { rows: string[]; color: string }> = {
@@ -46,7 +49,8 @@ const chosen = atom({ plugin: 'claudou', key: 'chosen' } as const, null as strin
 const bubble = atom({ plugin: 'claudou', key: 'bubble' } as const, null as string | null)   // what the crab says
 const layout = atom({ plugin: 'claudou', key: 'layout' } as const, 'horizontal' as Layout)  // band or side pane
 type Layout = 'horizontal' | 'vertical'
-const parade = atom({ plugin: 'claudou', key: 'parade' } as const, null as string | null)  // the form /claudou evolve shows
+type Look = { form: string; glow: boolean }
+const parade = atom({ plugin: 'claudou', key: 'parade' } as const, null as Look | null)  // what an evolution shows
 const line = atom({ plugin: 'claudou', key: 'starter' } as const, 'crab' as Starter)         // the pet's line
 const reaction = atom({ plugin: 'claudou', key: 'reaction' } as const, null as Reaction | null)  // beside the pet
 
@@ -60,7 +64,7 @@ let quietAt = 0                                  // when the bubble goes, in ms;
 let calmAt = 0                                   // when the reaction goes, in ms; 0 while asleep or with none
 let activeAt = 0                                 // the last time something happened, in ms
 let tipsSaid = 0
-let paradeLeft: Form[] = []                      // the forms /claudou evolve has still to show, one per tick
+let paradeTimer: Timer | null = null              // the next frame of an evolution
 
 // Subagents the main loop started in the turn under way (Crab team: 3 in one turn).
 let agentsThisTurn = 0
@@ -70,6 +74,7 @@ async function change($: EngineInterface, step: (p: Progress) => Progress): Prom
   const before = growth.normalize(await $.store.get(STORE_KEY))
   const after = step(before)
   if (after === before) return
+  const old = await shown($)
   await $.store.set(STORE_KEY, after)
   await update($, progress, () => after)
   for (const a of growth.unlocked(before, after)) $.ui.toast(t('unlockedToast', { name: t(`ach.${a}`) }))
@@ -80,6 +85,7 @@ async function change($: EngineInterface, step: (p: Progress) => Progress): Prom
   if (form !== growth.formAt(l, growth.level(before))) {
     $.ui.toast(t('evolvedToast', { form: nameOf(form) }))
     await choose($, null)                         // a new form shows itself, even after a swap
+    if (!(await read($, hidden)) && old !== form) await play($, evolution(old, form))
   }
 }
 
@@ -226,8 +232,7 @@ export const register: Register = (on, options) => {
     if (e.props.hasSurvey || e.props.maxRows < SPRITE_ROWS || room < 0 || (await read($, hidden))) return next(e)
     if ((await read($, layout)) === 'vertical') return next(e)
     const { Box, Text } = $.ui.resolve(e)
-    const form = await shown($)
-    const pose = poseAt(await read($, tick))
+    const { sprite, pose } = await look($)
     const said = await read($, bubble)
     const mood = await read($, reaction)
     const width = Math.min(48, room - 1)
@@ -242,7 +247,7 @@ export const register: Register = (on, options) => {
         <Box flexDirection="row">
           {mood ? moodColumn({ Box, Text }, mood) : null}
           <Box flexDirection="column">
-            {lines(SPRITES[form], pose).map((runs, r) => (
+            {lines(sprite, pose).map((runs, r) => (
               <Box key={`sprite${r}`} flexDirection="row">
                 {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
               </Box>
@@ -291,8 +296,7 @@ export const register: Register = (on, options) => {
   // sits at its bottom, near the prompt, and what it says above it.
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const { Box, Text } = $.ui.resolve(e)
-    const form = await shown($)
-    const pose = poseAt(await read($, tick))
+    const { sprite, pose } = await look($)
     const said = await read($, bubble)
     const mood = await read($, reaction)
     const docked = e.props.placement === 'dock'
@@ -308,7 +312,7 @@ export const register: Register = (on, options) => {
         <Box key="sprite" flexDirection="row">
           {mood ? moodColumn({ Box, Text }, mood) : null}
           <Box flexDirection="column">
-            {lines(SPRITES[form], pose).map((runs, r) => (
+            {lines(sprite, pose).map((runs, r) => (
               <Box key={`sprite${r}`} flexDirection="row">
                 {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
               </Box>
@@ -350,10 +354,6 @@ async function place($: EngineInterface, l: Layout): Promise<string> {
 async function beat($: EngineInterface): Promise<void> {
   ticks += 1
   await update($, tick, n => n + 1)
-  if (paradeLeft.length > 0 || (await read($, parade)) !== null) {
-    const next = paradeLeft.shift() ?? null
-    await update($, parade, () => next)
-  }
   if (ticks >= talkAt) {
     talkAt = ticks + TALK_EVERY
     await say($, nextTip(await read($, progress)))
@@ -424,15 +424,23 @@ async function choices($: EngineInterface): Promise<{ line: Starter; lvl: number
   return { line: l, lvl, reached, found, others: found }
 }
 
-// The form on screen: the one walking in /claudou evolve, else the one picked by swap while one may show it,
-// otherwise the newest of the line.
+// The form on screen: the one picked by swap while one may show it, otherwise the newest of the line.
 async function shown($: EngineInterface): Promise<Form> {
-  const walking = await read($, parade)
-  if (walking && SPRITES[walking]) return walking
   const { line: l, lvl, reached, others } = await choices($)
   const id = await read($, chosen)
   return id && (reached.includes(id) || others.includes(id)) ? id : growth.formAt(l, lvl)
 }
+
+// What is drawn: an evolution's frame, still and maybe glowing, else the form shown, moving.
+async function look($: EngineInterface): Promise<{ sprite: Sprite; pose: string }> {
+  const frame = await read($, parade)
+  if (frame && SPRITES[frame.form]) return { sprite: frame.glow ? glow(SPRITES[frame.form]!) : SPRITES[frame.form]!, pose: 'base' }
+  return { sprite: SPRITES[await shown($)]!, pose: poseAt(await read($, tick)) }
+}
+
+// The pet as a white shape: you can't tell yet what it becomes.
+const glow = (sprite: Sprite): Sprite =>
+  ({ ...sprite, palette: Object.fromEntries(Object.keys(sprite.palette).map(k => [k, GLOW])) })
 
 async function choose($: EngineInterface, form: Form | null): Promise<void> {
   await $.store.set(CHOSEN_KEY, form)
@@ -554,13 +562,42 @@ function achievements(p: Progress): string {
   return [t('achievements', { n: done.length, max: growth.ACHIEVEMENTS.length }), ...features, ...goals].join('\n')
 }
 
-// The pet walks through every form of its line it reached, one per tick, and comes back to the one it shows.
+// The pet evolves again through every form of its line it reached, and comes back to the one it shows.
 async function evolve($: EngineInterface): Promise<string> {
   if (await read($, hidden)) return t('evolveHidden')
   const { reached } = await choices($)
-  paradeLeft = reached.slice(1)
-  await update($, parade, () => reached[0]!)
+  await play($, reached.slice(1).flatMap((form, i) => evolution(reached[i]!, form)))
   return t('evolve', { forms: reached.map(nameOf).join(' → ') })
+}
+
+type Frame = Look & { ms: number; says?: string; sparkles?: boolean }
+
+// One evolution, as in Bashou: the old form, then the old and new shapes in white, faster and faster, then the
+// new form in its colors, with sparkles.
+function evolution(old: Form, form: Form): Frame[] {
+  const says = t('evolving', { name: nameOf(old) })
+  const out: Frame[] = [{ form: old, glow: false, ms: 1200, says }]
+  for (let pause = 400; pause > 70; pause *= 0.78)
+    out.push({ form: old, glow: true, ms: Math.round(pause) }, { form, glow: true, ms: Math.round(pause) })
+  out.push({ form, glow: true, ms: 500 },
+           { form, glow: false, ms: 1500, says: t('evolved', { old: nameOf(old), form: nameOf(form) }), sparkles: true })
+  return out
+}
+
+// Shows the frames one after another by the clock, then the form shown again; a new evolution replaces one
+// under way.
+async function play($: EngineInterface, frames: Frame[]): Promise<void> {
+  paradeTimer?.cancel()
+  paradeTimer = null
+  const step = async (i: number) => {
+    const f = frames[i]
+    await update($, parade, () => (f ? { form: f.form, glow: f.glow } : null))
+    if (!f) return
+    if (f.says) await say($, f.says)
+    if (f.sparkles) await react($, 'pass')
+    paradeTimer = $.clock.after(f.ms, () => void step(i + 1))
+  }
+  await step(0)
 }
 
 function share(p: Progress, l: Starter): string {

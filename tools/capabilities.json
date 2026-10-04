@@ -12,6 +12,7 @@
     "ui.render"
   ],
   "calls": [
+    "$.clock.after",
     "$.clock.every",
     "$.clock.now",
     "$.command.register",
