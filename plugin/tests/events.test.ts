@@ -7,7 +7,7 @@ const NOON = new Date(2026, 9, 3, 12).getTime()
 
 // The world beneath the mod: a store, a clock, tools that succeed (a skill named "broken" fails), toasts kept.
 function world(on: On, progress: Record<string, unknown> = {}) {
-  mock.store(on, { progress })
+  mock.store(on, { progress, layout: 'horizontal' })
   const clock = mock.clock(on, { now: NOON })
   const toasts: string[] = []
   on('ui.toast', (_$, e) => { toasts.push(e.text); return { value: undefined } })

@@ -4,8 +4,8 @@ export type Language = (typeof LANGUAGES)[number]
 
 export const MESSAGES = {
   commandHelp: {
-    en: 'Your crab: show or hide it, or ask on, off, hint, talk, stats, pets, swap, help',
-    fr: 'Ton crabe : l\'afficher ou le cacher, ou demander on, off, hint, talk, stats, pets, swap, help',
+    en: 'Your crab: show or hide it, or ask on, off, layout, hint, talk, stats, pets, swap, help',
+    fr: 'Ton crabe : l\'afficher ou le cacher, ou demander on, off, layout, hint, talk, stats, pets, swap, help',
   },
   help: {
     en: [
@@ -17,6 +17,7 @@ export const MESSAGES = {
       '/claudou swap <form>: show another form you reached (swap alone goes back to the newest)',
       '/claudou on (or here): show your crab',
       '/claudou off (or hide): hide it',
+      '/claudou layout horizontal|vertical: above the prompt, or in a column beside the conversation',
     ].join('\n'),
     fr: [
       '/claudou : afficher ou cacher ton crabe',
@@ -27,6 +28,7 @@ export const MESSAGES = {
       '/claudou swap <forme> : montrer une autre forme atteinte (swap seul revient à la plus récente)',
       '/claudou on (ou here) : afficher ton crabe',
       '/claudou off (ou hide) : le cacher',
+      '/claudou layout horizontal|vertical : au-dessus de la saisie, ou dans une colonne à côté de la conversation',
     ].join('\n'),
   },
   pets: { en: 'Forms reached ({n}/{max}):', fr: 'Formes atteintes ({n}/{max}) :' },
@@ -41,6 +43,23 @@ export const MESSAGES = {
   shown: {
     en: 'Your crab sits above the prompt, on the right.',
     fr: 'Ton crabe est au-dessus de la saisie, à droite.',
+  },
+  shownVertical: {
+    en: 'Your crab sits in a column beside the conversation (in fullscreen from 110 columns, above the prompt otherwise).',
+    fr: 'Ton crabe est dans une colonne à côté de la conversation (en plein écran dès 110 colonnes, sinon au-dessus de la saisie).',
+  },
+  layoutQuestion: { en: 'Where should your crab sit?', fr: 'Où doit s\'installer ton crabe ?' },
+  'layout.horizontal': {
+    en: 'Horizontal: above the prompt, on the right',
+    fr: 'Horizontal : au-dessus de la saisie, à droite',
+  },
+  'layout.vertical': {
+    en: 'Vertical: a column beside the conversation',
+    fr: 'Vertical : une colonne à côté de la conversation',
+  },
+  layoutUnknown: {
+    en: 'Choose with /claudou layout horizontal or /claudou layout vertical.',
+    fr: 'Choisis avec /claudou layout horizontal ou /claudou layout vertical.',
   },
   hidden: { en: 'Your crab is hiding. /claudou brings it back.', fr: 'Ton crabe se cache. /claudou le fait revenir.' },
   allTried: {

@@ -12,11 +12,14 @@ export const COMMAND = 'claudou'
 export const STORE_KEY = 'progress'
 export const HIDDEN_KEY = 'hidden'
 export const CHOSEN_KEY = 'chosen'
+export const LAYOUT_KEY = 'layout'
+export const PANE = 'claudou'
 export const SPRITE_ROWS = 6                     // 12 pixel rows, two per line
 export const SPRITE_COLUMNS = 17
+export const PANE_COLUMNS = 26                   // the vertical column: the crab and a narrow bubble
 export const FIRST_TALK = 250                    // ticks: the crab first speaks after 5 minutes,
 export const TALK_EVERY = 750                    // then every 15 minutes,
-export const BUBBLE_TICKS = 20                   // and its bubble stays 24 seconds
+export const BUBBLE_MS = 10_000                  // and its bubble stays 10 seconds, by the clock
 export const TIPS = ['clear', 'mention', 'rewind', 'init', 'bang', 'context', 'model', 'escape'] as const
 
 const progress = atom({ plugin: 'claudou', key: 'progress' } as const, growth.fresh())
@@ -24,6 +27,8 @@ const tick = atom({ plugin: 'claudou', key: 'tick' } as const, 0)       // moves
 const hidden = atom({ plugin: 'claudou', key: 'hidden' } as const, false)
 const chosen = atom({ plugin: 'claudou', key: 'chosen' } as const, null as string | null)   // a form picked by swap
 const bubble = atom({ plugin: 'claudou', key: 'bubble' } as const, null as string | null)   // what the crab says
+const layout = atom({ plugin: 'claudou', key: 'layout' } as const, 'horizontal' as Layout)  // band or side pane
+type Layout = 'horizontal' | 'vertical'
 
 // The player's language, from the mod's settings (/config): English unless they chose French.
 let language: Language = 'en'
@@ -31,7 +36,7 @@ const t = (id: MessageId, values: Record<string, string | number> = {}) => trans
 let ticking = false
 let ticks = 0
 let talkAt = FIRST_TALK
-let quietAt = 0
+let quietAt = 0                                  // when the bubble goes, in ms; 0 with none
 let tipsSaid = 0
 
 // Subagents the main loop started in the turn under way (Crab team: 3 in one turn).
@@ -68,6 +73,10 @@ export const register: Register = (on, options) => {
     await update($, hidden, () => isHidden)
     const picked = await $.store.get(CHOSEN_KEY)
     await update($, chosen, () => (typeof picked === 'string' ? picked : null))
+    const placed = await $.store.get(LAYOUT_KEY)
+    await update($, layout, () => (placed === 'vertical' ? 'vertical' : 'horizontal'))
+    if (placed === 'vertical' && !isHidden) void openPane($)
+    if (placed !== 'horizontal' && placed !== 'vertical' && e.isInteractive) void askLayout($).then(l => place($, l))
     if (!ticking) {
       ticking = true
       $.clock.every(TICK_MS, () => void beat($))
@@ -142,6 +151,11 @@ export const register: Register = (on, options) => {
     if (word === '') return { text: await show($, await read($, hidden)) }
     if (word === 'on' || word === 'here' || word === 'show') return { text: await show($, true) }
     if (word === 'hide' || word === 'off') return { text: await show($, false) }
+    if (word === 'layout') return { text: await place($, await askLayout($)) }
+    if (word.startsWith('layout ')) {
+      const l = layoutOf(word.slice(7).trim())
+      return { text: l ? await place($, l) : t('layoutUnknown') }
+    }
     if (word === 'hint') return { text: hint(p) }
     if (word === 'stats') return { text: stats(p) }
     if (word === 'talk') return { text: await say($, nextTip(p)) }
@@ -151,10 +165,11 @@ export const register: Register = (on, options) => {
     return { text: t('help') }
   })
 
-  // The crab on the right of the band just above the prompt, and what it says on its left.
+  // Horizontal: the crab on the right of the band just above the prompt, and what it says on its left.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const room = e.props.bodyColumns - SPRITE_COLUMNS
     if (e.props.hasSurvey || e.props.maxRows < SPRITE_ROWS || room < 0 || (await read($, hidden))) return next(e)
+    if ((await read($, layout)) === 'vertical') return next(e)
     const { Box, Text } = $.ui.resolve(e)
     const form = await shown($)
     const pose = poseAt(await read($, tick))
@@ -178,6 +193,57 @@ export const register: Register = (on, options) => {
       </Box>
     )
   })
+
+  // Vertical: a narrow column beside the conversation, the crab on top and what it says beneath.
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const form = await shown($)
+    const pose = poseAt(await read($, tick))
+    const said = await read($, bubble)
+
+    return (
+      <Box flexDirection="column" alignItems="center" width={e.props.bodyColumns}>
+        <Box flexDirection="column">
+          {lines(SPRITES[form], pose).map((runs, r) => (
+            <Box key={`sprite${r}`} flexDirection="row">
+              {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
+            </Box>
+          ))}
+        </Box>
+        {said ? (
+          <Box borderStyle="round" borderColor="#e07a5f" paddingX={1} marginTop={1} width={e.props.bodyColumns}>
+            <Text wrap="wrap">{said}</Text>
+          </Box>
+        ) : null}
+      </Box>
+    )
+  })
+}
+
+const openPane = ($: EngineInterface) =>
+  $.ui.open({ id: PANE, title: 'Claudou', columns: PANE_COLUMNS, rows: SPRITE_ROWS + 6 }).catch(() => undefined)
+
+// The question asked once at first start, and by /claudou layout; dismissed, the crab stays above the prompt.
+async function askLayout($: EngineInterface): Promise<Layout> {
+  const options = [t('layout.horizontal'), t('layout.vertical')]
+  const answer = await $.ui.ask(t('layoutQuestion'), { options, header: 'Claudou' }).catch(() => options[0])
+  return answer === options[1] ? 'vertical' : 'horizontal'
+}
+
+function layoutOf(word: string): Layout | null {
+  if (['horizontal', 'h', 'band', 'bande'].includes(word)) return 'horizontal'
+  if (['vertical', 'v', 'side', 'pane', 'colonne', 'column'].includes(word)) return 'vertical'
+  return null
+}
+
+// Puts the crab in the band or the side pane, from now on; returns what to tell the person.
+async function place($: EngineInterface, l: Layout): Promise<string> {
+  const before = await read($, layout)
+  await $.store.set(LAYOUT_KEY, l)
+  await update($, layout, () => l)
+  if (l === 'vertical' && !(await read($, hidden))) await openPane($)
+  if (l === 'horizontal' && before === 'vertical') await $.ui.close({ id: PANE })
+  return l === 'vertical' ? t('shownVertical') : t('shown')
 }
 
 // One tick: the crab moves, now and then it speaks, and its bubble goes after a while.
@@ -187,13 +253,14 @@ async function beat($: EngineInterface): Promise<void> {
   if (ticks >= talkAt) {
     talkAt = ticks + TALK_EVERY
     await say($, nextTip(await read($, progress)))
-  } else if (ticks === quietAt) {
+  } else if (quietAt !== 0 && (await $.clock.now()) >= quietAt) {
+    quietAt = 0
     await update($, bubble, () => null)
   }
 }
 
 async function say($: EngineInterface, text: string): Promise<string> {
-  quietAt = ticks + BUBBLE_TICKS
+  quietAt = (await $.clock.now()) + BUBBLE_MS
   await update($, bubble, () => text)
 
   return text
@@ -262,8 +329,11 @@ function pets(p: Progress, current: Form): string {
 async function show($: EngineInterface, visible: boolean): Promise<string> {
   await $.store.set(HIDDEN_KEY, !visible)
   await update($, hidden, () => !visible)
+  const isVertical = (await read($, layout)) === 'vertical'
+  if (isVertical && visible) await openPane($)
+  if (isVertical && !visible) await $.ui.close({ id: PANE })
 
-  return visible ? t('shown') : t('hidden')
+  return !visible ? t('hidden') : isVertical ? t('shownVertical') : t('shown')
 }
 
 function hint(p: Progress): string {

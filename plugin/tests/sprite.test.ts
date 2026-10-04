@@ -50,7 +50,7 @@ test('the poses go round', () => {
 })
 
 function world(on: On, progress: Record<string, unknown> = {}) {
-  mock.store(on, { progress })
+  mock.store(on, { progress, layout: 'horizontal' })
   const clock = mock.clock(on, { now: 0 })
   on('ui.toast', () => ({ value: undefined }))
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))

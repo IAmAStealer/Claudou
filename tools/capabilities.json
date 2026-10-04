@@ -19,6 +19,9 @@
     "$.state.set",
     "$.store.get",
     "$.store.set",
+    "$.ui.ask",
+    "$.ui.close",
+    "$.ui.open",
     "$.ui.resolve",
     "$.ui.toast"
   ]

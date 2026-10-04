@@ -43,6 +43,7 @@ Claude Code features you haven't tried, then everyday tricks. It speaks English 
 | `/claudou pets` | the forms your crab reached |
 | `/claudou swap <form>` | show another form you reached, by number or name (`swap` alone: the newest) |
 | `/claudou on`, `/claudou off` | show it, hide it (also `here`, `hide`) |
+| `/claudou layout horizontal`, `/claudou layout vertical` | above the prompt, or in a column beside the conversation (asked once at first start; `layout` alone asks again) |
 
 To update: `/plugin marketplace update claudou`, then `/plugin update claudou@claudou`.
 
