@@ -8,7 +8,7 @@ test and commit without asking first. Only touch files in this repo; anything ou
   The engine's API: `vendor/claude-code.d.ts` (written by Claude Code; refresh it from a newer version with
   `tools/refresh_types.sh` and read the diff).
 - Local notes (untracked): `bug_report`, `.idea`, `doc/JOURNAL.md`, `doc/PLAN.md`. Read `doc/JOURNAL.md` to get
-  back up to speed; add a line there after each change. Design decisions so far: Bashou's doc/PLAN.md, "Claudou".
+  back up to speed; add a line there after each change. Design decisions and the roadmap: `doc/PLAN.md`.
 - **No npm dependencies, ever** (owner's rule): no `dependencies` in a package.json, no `npm install`. Tools come
   from Debian (`nodejs`) or are reviewed by the owner first (`typescript`, pinned). A test checks it, and a
   Claude Code hook blocks downloads (`~/.claude/hooks/no-external-downloads.py`).
@@ -19,4 +19,9 @@ test and commit without asking first. Only touch files in this repo; anything ou
 - English and French for everything a player reads; French is tutoiement.
 - Commit subjects are short sentences in plain English (they become release notes). A release is a commit with
   a line `release: vX.Y.Z` and a `## vX.Y.Z — date` section in CHANGELOG.md.
+- The crab lives in the `AbovePrompt` band (right-aligned, with a speech bubble), not a pane: the owner found the
+  pane too big. Commands are `/claudou <word>` (on, off, hint, talk, stats, pets, swap…), like `bashou <word>`.
+- Mod test gotchas: every event the mod calls `next(e)` on needs an answer beneath it in the test (`on(event, …)`;
+  `ui.render` must return a tree element); a component can be mounted once per test (no prop update); advance the
+  clock tick by tick past the 1.2 s timer; a module function can't share a name with any parameter handed to `$`.
 - Pet art: show a preview (terminal and PNG) to the owner before committing a new sprite.
