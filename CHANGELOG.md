@@ -3,6 +3,15 @@
 Every release has a section here, written for players. CI refuses to tag a release without one
 (`python3 tools/changelog.py v1.2.3` prints the section it will publish).
 
+## v0.1.7 — 2026-10-04
+
+- Pets to collect: each Claude Code feature brings one, and it grows the more you use that feature. An Owl for
+  plan mode, an Ant for subagents, an Octopus for three at once, a Bee for skills, a Squirrel for `/compact`, a
+  Turtle for memory files, a Spider for MCP tools, a Pigeon for resumed sessions. Find them in `/claudou pets`.
+- Your pet reacts to what Claude does: a ✦ when tests pass, a ! when a command fails, a ♪ when a long turn ends,
+  and it dozes (z z) when nothing has happened for five minutes.
+- `/claudou` alone now lists the commands; `/claudou on` and `/claudou off` show and hide your pet.
+
 ## v0.1.6 — 2026-10-04
 
 - `/claudou swap` shows the forms you can pick, in color and numbered like the choices, just above the question.
