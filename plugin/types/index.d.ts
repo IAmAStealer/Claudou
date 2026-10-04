@@ -18,7 +18,7 @@ declare module 'claude-code' {
   interface PluginState {
     claudou: { progress: Progress; tick: number; hidden: boolean; chosen: string | null; bubble: string | null
                layout: 'horizontal' | 'vertical'; parade: string | null
-               starter: 'crab' | 'star' | 'sprout' | 'pebble'; bashou: string[]
+               starter: 'crab' | 'star' | 'sprout' | 'pebble'
                reaction: 'pass' | 'fail' | 'done' | 'idle' | null }
   }
 }

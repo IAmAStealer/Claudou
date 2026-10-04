@@ -32,8 +32,6 @@ Turtle for memory files, a Spider for MCP tools, a Pigeon for resumed sessions. 
 Your pet reacts to what Claude does: a ✦ when tests pass, a ! when a command fails, a ♪ when a long turn ends,
 and z z when nothing has happened for a while.
 
-Also playing Bashou? `/claudou swap` can show the pets you unlocked there.
-
 ## Install
 
 In Claude Code:
@@ -76,7 +74,6 @@ Coming next: good work habits (tests, reviewed diffs, small commits), other star
 - **No dependencies**: not a single npm package. CI refuses any `package.json` dependency, lockfile or import.
 - **Counters only, nothing sent**: the mod may only use the hooks and engine calls listed in
   `tools/capabilities.json`; CI reads what Claude Code itself sees in the code and refuses anything else.
-  The one file it reads is Bashou's save, when Bashou is installed, to show the pets you unlocked there.
 - Secret scanning, CodeQL, OpenSSF Scorecard, protected `main` branch and release tags.
   Report a security problem privately: [SECURITY.md](.github/SECURITY.md).
 

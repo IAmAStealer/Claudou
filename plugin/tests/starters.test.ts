@@ -7,25 +7,18 @@ import { TICK_MS } from '../hooks/sprite'
 import { SPRITES } from '../hooks/sprites'
 import { LINES } from '../hooks/growth'
 
-// The world beneath the mod: a store, Bashou's save when given (else no such file), and the answers to the
-// mod's questions, by question (null: dismissed).
+// The world beneath the mod: a store, and the answers to the mod's questions, by question (null: dismissed).
 function world(on: On, stored: Record<string, unknown>, options: {
-  answers?: Record<string, (labels: string[]) => string | null>; bashou?: unknown; env?: Record<string, string>
+  answers?: Record<string, (labels: string[]) => string | null>
 } = {}) {
   const asked: string[] = []
-  const reads: string[] = []
   const toasts: string[] = []
   mock.store(on, { layout: 'horizontal', ...stored })
-  mock.env(on, options.env ?? { HOME: '/home/p' })
   const clock = mock.clock(on, { now: 0 })
   on('ui.toast', (_$, e) => { toasts.push(e.text); return { value: undefined } })
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))
   on('command.register', async () => ({ value: undefined }) as never)
   on('ui.render', { component: 'AbovePrompt' }, async ($, e) => h($.ui.resolve(e).Text, {}, 'beneath') as never)
-  on('fs.read', async (_$, e) => {
-    reads.push(e.path)
-    return options.bashou === undefined ? { deny: 'ENOENT' } : { value: JSON.stringify(options.bashou) }
-  })
   on('tool.call', { tool: 'AskUserQuestion' }, async (_$, e) => {
     const q = e.questions[0]!
     asked.push(q.question)
@@ -33,7 +26,7 @@ function world(on: On, stored: Record<string, unknown>, options: {
     if (said === null) return { deny: 'dismissed' }
     return { result: { questions: e.questions, answers: { [q.question]: said } } } as never
   })
-  return { clock, asked, reads, toasts }
+  return { clock, asked, toasts }
 }
 
 const run = async ($: Engine, args: string) => (await $.command.run({
@@ -128,45 +121,12 @@ test('in French, the last Pebble form is the Caillou chéri', { options: { langu
 })
 
 
-const SAVE = { starter: 'sprout', starter_best: 'grass', pets: ['fox', 'slime', 'nope'], ladder_best: { slime: 'leaf_slime' },
-               looks: { fox: 'fox' } }
-
-test('with Bashou installed, the pets unlocked there can be shown too', async ($, on) => {
-  const { clock, reads } = world(on, { ...LEVEL_9, starter: 'crab' }, { bashou: SAVE })
+test('a Bashou pet picked when Claudou read Bashou\'s save gives way to the newest form', async ($, on) => {
+  const { clock } = world(on, { ...LEVEL_9, starter: 'crab', chosen: 'seedling' })
   await start($)
   await clock.settle()
-  expect(reads).toEqual(['/home/p/.local/share/bashou/state.json'])
-  const list = await run($, 'pets')
-  expect(list).toContain(t('fromBashou'))
-  expect(list).toContain('  6. Pygmy owl')                              // found with plan mode, before Bashou's
-  expect(list).toContain('  7. Seedling')
-  for (const name of ['Sprout', 'Grass', 'Fennec', 'Fox', 'Droplet', 'Slime', 'Leaf slime']) expect(list).toContain(name)
-  expect(list.includes('Kitsune')).toBe(false)                          // fox's next form: not reached in Bashou
-  expect(await run($, 'swap fox')).toBe('Your pet is now a Fox.')
-  expect(JSON.stringify(await (await band($)).drawn())).toContain(SPRITES.fox!.palette[Object.keys(SPRITES.fox!.palette)[0]!]!)
-  expect(await run($, 'swap kitsune')).toBe('No form called "kitsune". /claudou pets lists them.')
-  expect(await run($, 'swap 7')).toBe('Your pet is now a Seedling.')
-})
-
-test('Bashou\'s save is read where BASHOU_DATA says', async ($, on) => {
-  const { clock, reads } = world(on, LEVEL_9, { bashou: SAVE, env: { HOME: '/home/p', BASHOU_DATA: '/data/b' } })
-  await start($)
-  await clock.settle()
-  expect(reads).toEqual(['/data/b/state.json'])
-})
-
-test('without Bashou, or with a damaged save, only the line\'s forms', async ($, on) => {
-  const { clock } = world(on, LEVEL_9)
-  await start($)
-  await clock.settle()
-  expect((await run($, 'pets')).includes(t('fromBashou'))).toBe(false)
-})
-
-test('a damaged Bashou save is ignored', async ($, on) => {
-  const { clock } = world(on, LEVEL_9, { bashou: { pets: 'fox', starter: 3, looks: [1] } })
-  await start($)
-  await clock.settle()
-  expect((await run($, 'pets')).includes(t('fromBashou'))).toBe(false)
+  expect(await run($, 'pets')).not.toContain('Seedling')
+  expect(JSON.stringify(await (await band($)).drawn())).not.toContain(SPRITES.seedling!.palette[Object.keys(SPRITES.seedling!.palette)[0]!]!)
 })
 
 test('evolving on a Bashou line shows the new form', async ($, on) => {

@@ -48,7 +48,6 @@ const layout = atom({ plugin: 'claudou', key: 'layout' } as const, 'horizontal' 
 type Layout = 'horizontal' | 'vertical'
 const parade = atom({ plugin: 'claudou', key: 'parade' } as const, null as string | null)  // the form /claudou evolve shows
 const line = atom({ plugin: 'claudou', key: 'starter' } as const, 'crab' as Starter)         // the pet's line
-const bashou = atom({ plugin: 'claudou', key: 'bashou' } as const, [] as string[])          // Bashou pets one may show
 const reaction = atom({ plugin: 'claudou', key: 'reaction' } as const, null as Reaction | null)  // beside the pet
 
 // The player's language, from the mod's settings (/config): English unless they chose French.
@@ -108,8 +107,6 @@ export const register: Register = (on, options) => {
     const isNew = !growth.isStarter(started) && stored.days === 0 && stored.prompts === 0
     const isPlaced = placed === 'horizontal' || placed === 'vertical'
     if (e.isInteractive && (isNew || !isPlaced)) void firstStart($, isNew, isPlaced)
-    await update($, bashou, () => [])
-    void bashouPets($).then(found => update($, bashou, () => found)).catch(() => undefined)
     activeAt = await $.clock.now()
     if (!ticking) {
       ticking = true
@@ -407,8 +404,8 @@ function nameOf(id: Form): string {
   return BASHOU_NAMES[id]?.[language] ?? id
 }
 
-// The forms one may show: those of the line reached, the pets found with Claude Code, then the Bashou pets
-// found; numbered in that order. `others` holds the last two.
+// The forms one may show: those of the line reached, then the pets found with Claude Code; numbered in that
+// order. `others` holds the pets found.
 async function choices($: EngineInterface): Promise<{ line: Starter; lvl: number; reached: Form[]; found: Form[]
                                                      others: Form[] }> {
   const l = await read($, line)
@@ -416,8 +413,7 @@ async function choices($: EngineInterface): Promise<{ line: Starter; lvl: number
   const lvl = growth.level(p)
   const reached = growth.reached(l, lvl)
   const found = growth.companions(p).filter(id => !reached.includes(id))
-  const fromBashou = (await read($, bashou)).filter(id => !reached.includes(id) && !found.includes(id))
-  return { line: l, lvl, reached, found, others: [...found, ...fromBashou] }
+  return { line: l, lvl, reached, found, others: found }
 }
 
 // The form on screen: the one walking in /claudou evolve, else the one picked by swap while one may show it,
@@ -438,7 +434,7 @@ async function choose($: EngineInterface, form: Form | null): Promise<void> {
 const simple = (name: string) => name.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '')
 
 // A form by its number in /claudou pets, its name in any language, or the start of it: among the line's forms
-// (reached or not) and the Bashou pets found.
+// (reached or not) and the pets found.
 function findForm(name: string, numbered: Form[], all: Form[]): Form | undefined {
   const n = Number(name)
   if (Number.isInteger(n) && n >= 1) return numbered[n - 1]
@@ -466,8 +462,7 @@ async function swap($: EngineInterface, name: string): Promise<string> {
 const lastForm = (l: Starter) => (l === 'crab' ? t('lastForm') : t('lastFormAny'))
 
 async function pets($: EngineInterface): Promise<string> {
-  const { line: l, lvl, reached, found, others } = await choices($)
-  const fromBashou = others.slice(found.length)
+  const { line: l, lvl, reached, found } = await choices($)
   const current = await shown($)
   const mark = (id: Form, i: number) => `${id === current ? '▸' : ' '} ${i + 1}. ${nameOf(id)}`
   const next = growth.nextForm(l, lvl)
@@ -478,8 +473,6 @@ async function pets($: EngineInterface): Promise<string> {
           t('fromClaude', { n: families.size, max: growth.FEATURES.length }),
           ...found.map((id, i) => mark(id, reached.length + i)),
           ...(left > 0 ? [t('petsLeft', { n: left })] : []),
-          ...(fromBashou.length > 0
-            ? [t('fromBashou'), ...fromBashou.map((id, i) => mark(id, reached.length + found.length + i))] : []),
           t('petsNext')].join('\n')
 }
 
@@ -516,8 +509,8 @@ function stats(p: Progress, l: Starter): string {
   ].join('\n')
 }
 
-// /claudou swap alone: a picker of the forms reached, newest first, then Bashou's (4 at most; "Other" takes a
-// name or number).
+// /claudou swap alone: a picker of the forms reached, newest first, then the pets found (4 at most; "Other"
+// takes a name or number).
 async function pick($: EngineInterface): Promise<string> {
   const { reached, others } = await choices($)
   const all = [...[...reached].reverse(), ...others]
@@ -603,28 +596,4 @@ async function start($: EngineInterface): Promise<string> {
 async function firstStart($: EngineInterface, isNew: boolean, isPlaced: boolean): Promise<void> {
   if (isNew) await settle($, (await askStarter($)) ?? 'crab')
   if (!isPlaced) await place($, await askLayout($))
-}
-
-// The Bashou pets this player unlocked, read from Bashou's save when Bashou is installed: each family's form
-// picked or reached there, and its earlier forms. Only that one file is read; nothing is written.
-async function bashouPets($: EngineInterface): Promise<Form[]> {
-  const dir = (await $.env.get('BASHOU_DATA')) ?? `${await $.env.get('HOME')}/.local/share/bashou`
-  const save = JSON.parse(await $.fs.read(`${dir}/state.json`)) as Record<string, unknown>
-  const get = (key: string): Record<string, unknown> => {
-    const v = save[key]
-    return v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {}
-  }
-  const owned = Array.isArray(save.pets) ? save.pets.filter((x): x is string => typeof x === 'string') : []
-  const upTo = (forms: readonly string[], at: unknown) => forms.slice(0, Math.max(1, forms.indexOf(String(at)) + 1))
-  const found: Form[] = []
-  if (typeof save.starter === 'string' && BASHOU_FAMILIES[save.starter]) {
-    found.push(...upTo(BASHOU_FAMILIES[save.starter]!.forms, save.starter_best))
-  }
-  for (const family of owned) {
-    const forms = BASHOU_FAMILIES[family]?.forms
-    if (!forms) continue
-    const at = [get('ladder_best')[family], get('looks')[family]].map(x => forms.indexOf(String(x)))
-    found.push(...forms.slice(0, Math.max(1, ...at.map(i => i + 1))))
-  }
-  return [...new Set(found)].filter(id => SPRITES[id] !== undefined)
 }

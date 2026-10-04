@@ -149,7 +149,6 @@ export const MESSAGES = {
     fr: 'Ton compagnon est maintenant {form}. Ton niveau et tes succès restent.',
   },
   startKept: { en: 'Your pet stays a {form}.', fr: 'Ton compagnon reste {form}.' },
-  fromBashou: { en: 'From Bashou:', fr: 'De Bashou :' },
   lastForm: {
     en: 'Everything ends up a crab: nature evolved crabs at least five times. Now so did you.',
     fr: 'Tout finit en crabe : la nature a inventé le crabe au moins cinq fois. Toi aussi, maintenant.',

@@ -1,5 +1,5 @@
 {
-  "_why": "What the mod may hook and call. SECURITY.md promises counters only, nothing sent; the one file read is Bashou's save (HOME or BASHOU_DATA), for the Bashou pets one may show. A new capability is a reviewed change to this file (pr-reviewer flags it).",
+  "_why": "What the mod may hook and call. SECURITY.md promises counters only, nothing sent; no file is read. A new capability is a reviewed change to this file (pr-reviewer flags it).",
   "hooks": [
     "session.start",
     "classic.SessionStart",
@@ -15,8 +15,6 @@
     "$.clock.every",
     "$.clock.now",
     "$.command.register",
-    "$.env.get",
-    "$.fs.read",
     "$.state.get",
     "$.state.set",
     "$.store.get",
