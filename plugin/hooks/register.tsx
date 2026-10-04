@@ -217,27 +217,30 @@ export const register: Register = (on, options) => {
     )
   })
 
-  // Vertical: a narrow column beside the conversation, the crab on top and what it says beneath.
+  // Vertical: a narrow column beside the conversation. Docked, the column is as tall as the screen: the crab
+  // sits at its bottom, near the prompt, and what it says above it.
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const { Box, Text } = $.ui.resolve(e)
     const form = await shown($)
     const pose = poseAt(await read($, tick))
     const said = await read($, bubble)
+    const docked = e.props.placement === 'dock'
 
     return (
-      <Box flexDirection="column" alignItems="center" width={e.props.bodyColumns}>
-        <Box flexDirection="column">
+      <Box flexDirection="column" alignItems="center" width={e.props.bodyColumns}
+        {...(docked ? { height: e.props.scroll.bodyRows, justifyContent: 'flex-end' as const } : {})}>
+        {said ? (
+          <Box borderStyle="round" borderColor="#e07a5f" paddingX={1} marginBottom={1} width={e.props.bodyColumns}>
+            <Text wrap="wrap">{said}</Text>
+          </Box>
+        ) : null}
+        <Box key="sprite" flexDirection="column">
           {lines(SPRITES[form], pose).map((runs, r) => (
             <Box key={`sprite${r}`} flexDirection="row">
               {runs.map((run, i) => <Text key={`${r}.${i}`} color={run.color} backgroundColor={run.background}>{run.text}</Text>)}
             </Box>
           ))}
         </Box>
-        {said ? (
-          <Box borderStyle="round" borderColor="#e07a5f" paddingX={1} marginTop={1} width={e.props.bodyColumns}>
-            <Text wrap="wrap">{said}</Text>
-          </Box>
-        ) : null}
       </Box>
     )
   })

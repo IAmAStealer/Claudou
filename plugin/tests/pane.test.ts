@@ -205,7 +205,7 @@ test('/claudou layout switches between the band and the column; off and on close
 })
 
 for (const surface of ['terminal', 'desktop'] as const) {
-  test(`the vertical crab is drawn in its column, with what it says beneath, on ${surface}`, async ($, on) => {
+  test(`the vertical crab is drawn in its column, with what it says, on ${surface}`, async ($, on) => {
     world(on, { layout: 'vertical' })
     placing(on, 'vertical')
     await $.session.start({ cwd: '/r', surface, isInteractive: true })
@@ -213,5 +213,16 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(JSON.stringify(await pane.drawn())).toContain('▀')
     const said = await run($, 'talk')
     expect(JSON.stringify(await pane.drawn())).toContain(said.slice(0, 20))
+  })
+
+  test(`docked, the vertical crab sits at the bottom of its column, what it says above it, on ${surface}`, async ($, on) => {
+    world(on, { layout: 'vertical' })
+    placing(on, 'vertical')
+    await $.session.start({ cwd: '/r', surface, isInteractive: true })
+    const pane = await column($, surface)
+    await run($, 'talk')
+    const root = await pane.drawn() as unknown as { props: Record<string, unknown>; children: { props: Record<string, unknown> }[] }
+    expect(root.props).toMatchObject({ height: 30, justifyContent: 'flex-end' })
+    expect(root.children.map(c => c.props.key ?? (c.props.borderStyle ? 'bubble' : '?'))).toEqual(['bubble', 'sprite'])
   })
 }
