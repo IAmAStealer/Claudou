@@ -67,7 +67,7 @@ export function forms(line: Starter): { id: Form; level: number }[] {
 export const isStarter = (x: unknown): x is Starter => STARTERS.includes(x as Starter)
 
 export function fresh(): Progress {
-  return { days: 0, lastDay: '', streak: 0, bestStreak: 0, tokens: 0, prompts: 0, sessions: 0, features: [] }
+  return { days: 0, lastDay: '', streak: 0, bestStreak: 0, tokens: 0, prompts: 0, sessions: 0, features: [], uses: {} }
 }
 
 // What the store holds may be missing, old or damaged: keep only what makes sense.
@@ -82,6 +82,13 @@ export function normalize(stored: unknown): Progress {
   if (typeof s.lastDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.lastDay)) p.lastDay = s.lastDay
   if (Array.isArray(s.features)) {
     p.features = FEATURES.filter(f => (s.features as unknown[]).includes(f))
+  }
+  const uses = typeof s.uses === 'object' && s.uses !== null ? s.uses as Record<string, unknown> : {}
+  for (const f of FEATURES) {
+    const n = uses[f]
+    const counted = typeof n === 'number' && Number.isFinite(n) && n >= 1 ? Math.floor(n) : 0
+    const atLeast = p.features.includes(f) ? 1 : 0                 // saves from before the counts: used once
+    if (Math.max(counted, atLeast) > 0) p.uses[f] = Math.max(counted, atLeast)
   }
   return p
 }
@@ -123,7 +130,29 @@ export function startedSession(p: Progress): Progress {
 }
 
 export function used(p: Progress, feature: Feature): Progress {
-  return p.features.includes(feature) ? p : { ...p, features: [...p.features, feature] }
+  const features = p.features.includes(feature) ? p.features : [...p.features, feature]
+  return { ...p, features, uses: { ...p.uses, [feature]: (p.uses[feature] ?? 0) + 1 } }
+}
+
+// The pets found with Claude Code: each feature brings a Bashou family; its first form comes with the first use,
+// the next ones as the feature is used more.
+export const COMPANIONS: Record<Feature, string> = {
+  planner: 'owl', delegator: 'ant', crabTeam: 'octopus', skilledClaw: 'bee', tidyTide: 'squirrel',
+  shellMemory: 'turtle', pluggedIn: 'spider', burrow: 'pigeon',
+}
+export const COMPANION_USES = [1, 10, 50] as const
+
+// The forms of the pets found, in the features' order, each family's first to the last reached.
+export function companions(p: Progress): Form[] {
+  return FEATURES.flatMap(f => BASHOU_FAMILIES[COMPANIONS[f]]!.forms
+    .filter((_, i) => i < COMPANION_USES.length && (p.uses[f] ?? 0) >= COMPANION_USES[i]!))
+}
+
+// The companion forms a change brought: a pet that joined (its first form) or grew.
+export function companionsGained(before: Progress, after: Progress): { form: Form; joined: boolean }[] {
+  const had = new Set(companions(before))
+  const firsts = new Set(FEATURES.map(f => BASHOU_FAMILIES[COMPANIONS[f]]!.forms[0]))
+  return companions(after).filter(f => !had.has(f)).map(form => ({ form, joined: firsts.has(form) }))
 }
 
 export function achieved(p: Progress): Achievement[] {

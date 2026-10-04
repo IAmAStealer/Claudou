@@ -92,7 +92,25 @@ test('a damaged or old store gives clean progress', () => {
   expect(growth.normalize('x')).toEqual(growth.fresh())
   const p = growth.normalize({ days: -3, tokens: 12.7, prompts: 'many', lastDay: 'yesterday',
                                features: ['planner', 'flying', 'planner', 4], sessions: Infinity })
-  expect(p).toEqual({ ...growth.fresh(), tokens: 12, features: ['planner'] })
+  expect(p).toEqual({ ...growth.fresh(), tokens: 12, features: ['planner'], uses: { planner: 1 } })   // used once, before counts
+  expect(growth.normalize({ features: ['planner'], uses: { planner: 12.5, burrow: -1, flying: 3, skilledClaw: 'x' } }).uses)
+    .toEqual({ planner: 12 })
+})
+
+test('each feature brings its pet: the first form at the first use, the next ones at 10 and 50 uses', () => {
+  expect(growth.companions(growth.fresh())).toEqual([])
+  let p = growth.used(growth.fresh(), 'planner')
+  expect(growth.companions(p)).toEqual(['pygmy_owl'])
+  expect(growth.companionsGained(growth.fresh(), p)).toEqual([{ form: 'pygmy_owl', joined: true }])
+  for (let i = 1; i < 10; i++) p = growth.used(p, 'planner')
+  expect(growth.companions(p)).toEqual(['pygmy_owl', 'barn_owl'])
+  const before = p
+  for (let i = 10; i < 50; i++) p = growth.used(p, 'planner')
+  expect(growth.companionsGained(before, p)).toEqual([{ form: 'owl', joined: false }])
+  expect(growth.level(p)).toBe(1)                                             // uses grow the pet, not the level
+  const pets = Object.fromEntries(growth.FEATURES.map(f => [f, growth.companions(growth.used(growth.fresh(), f))[0]]))
+  expect(pets).toEqual({ planner: 'pygmy_owl', delegator: 'ant', crabTeam: 'octopito', skilledClaw: 'brood',
+                         tidyTide: 'squirrel', shellMemory: 'hatchling', pluggedIn: 'spiderling', burrow: 'squab' })
 })
 
 test('memory files: CLAUDE.md and memory folders, nothing else', () => {

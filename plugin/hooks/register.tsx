@@ -57,6 +57,8 @@ async function change($: EngineInterface, step: (p: Progress) => Progress): Prom
   await $.store.set(STORE_KEY, after)
   await update($, progress, () => after)
   for (const a of growth.unlocked(before, after)) $.ui.toast(t('unlockedToast', { name: t(`ach.${a}`) }))
+  for (const { form, joined } of growth.companionsGained(before, after))
+    $.ui.toast(t(joined ? 'petJoined' : 'petGrew', { pet: nameOf(form) }))
   const l = await read($, line)
   const form = growth.formAt(l, growth.level(after))
   if (form !== growth.formAt(l, growth.level(before))) {
@@ -124,7 +126,7 @@ export const register: Register = (on, options) => {
     if (tool === 'Agent' && !e.agentId) {
       agentsThisTurn += 1
       await use($, 'delegator')
-      if (agentsThisTurn >= 3) await use($, 'crabTeam')
+      if (agentsThisTurn === 3) await use($, 'crabTeam')
     }
     if (tool === 'Skill') await use($, 'skilledClaw')
     if (tool.startsWith('mcp__')) await use($, 'pluggedIn')
@@ -345,13 +347,17 @@ function nameOf(id: Form): string {
   return BASHOU_NAMES[id]?.[language] ?? id
 }
 
-// The forms one may show: those of the line reached, then the Bashou pets found; numbered in that order.
-async function choices($: EngineInterface): Promise<{ line: Starter; lvl: number; reached: Form[]; others: Form[] }> {
+// The forms one may show: those of the line reached, the pets found with Claude Code, then the Bashou pets
+// found; numbered in that order. `others` holds the last two.
+async function choices($: EngineInterface): Promise<{ line: Starter; lvl: number; reached: Form[]; found: Form[]
+                                                     others: Form[] }> {
   const l = await read($, line)
-  const lvl = growth.level(await read($, progress))
+  const p = await read($, progress)
+  const lvl = growth.level(p)
   const reached = growth.reached(l, lvl)
-  const others = (await read($, bashou)).filter(id => !reached.includes(id))
-  return { line: l, lvl, reached, others }
+  const found = growth.companions(p).filter(id => !reached.includes(id))
+  const fromBashou = (await read($, bashou)).filter(id => !reached.includes(id) && !found.includes(id))
+  return { line: l, lvl, reached, found, others: [...found, ...fromBashou] }
 }
 
 // The form on screen: the one walking in /claudou evolve, else the one picked by swap while one may show it,
@@ -400,13 +406,20 @@ async function swap($: EngineInterface, name: string): Promise<string> {
 const lastForm = (l: Starter) => (l === 'crab' ? t('lastForm') : t('lastFormAny'))
 
 async function pets($: EngineInterface): Promise<string> {
-  const { line: l, lvl, reached, others } = await choices($)
+  const { line: l, lvl, reached, found, others } = await choices($)
+  const fromBashou = others.slice(found.length)
   const current = await shown($)
   const mark = (id: Form, i: number) => `${id === current ? '▸' : ' '} ${i + 1}. ${nameOf(id)}`
   const next = growth.nextForm(l, lvl)
+  const families = new Set(found.map(id => growth.FEATURES.find(f => BASHOU_FAMILIES[growth.COMPANIONS[f]]!.forms.includes(id))))
+  const left = growth.FEATURES.length - families.size
   return [t('pets', { n: reached.length, max: growth.LINES[l].length }), ...reached.map(mark),
           next ? t('nextForm', { form: nameOf(next.id), n: next.level }) : lastForm(l),
-          ...(others.length > 0 ? [t('fromBashou'), ...others.map((id, i) => mark(id, reached.length + i))] : []),
+          t('fromClaude', { n: families.size, max: growth.FEATURES.length }),
+          ...found.map((id, i) => mark(id, reached.length + i)),
+          ...(left > 0 ? [t('petsLeft', { n: left })] : []),
+          ...(fromBashou.length > 0
+            ? [t('fromBashou'), ...fromBashou.map((id, i) => mark(id, reached.length + found.length + i))] : []),
           t('petsNext')].join('\n')
 }
 
@@ -424,7 +437,9 @@ async function show($: EngineInterface, visible: boolean): Promise<string> {
 function hint(p: Progress): string {
   const next = growth.FEATURES.find(f => !p.features.includes(f))
 
-  return next ? `${t('toFind')} ${t(`ach.${next}`)}\n${t(`how.${next}`)}` : t('allTried')
+  if (!next) return t('allTried')
+  const pet = nameOf(BASHOU_FAMILIES[growth.COMPANIONS[next]]!.forms[0]!)
+  return `${t('toFind')} ${t(`ach.${next}`)}\n${t(`how.${next}`)}\n${t('hintPet', { pet })}`
 }
 
 function stats(p: Progress, l: Starter): string {

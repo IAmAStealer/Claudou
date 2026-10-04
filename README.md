@@ -23,7 +23,11 @@ At first start you choose your pet (`/claudou start` changes it later; your leve
   crab, a coconut crab on its coconut, a Tasmanian giant crab, a Japanese spider crab… and then, since
   everything ends up a crab, one last form.
 - **Star**, **Sprout** or **Pebble**: the starters of [Bashou](https://github.com/IAmAStealer/Bashou), the pet
-  of your shell: stardust to a red giant, a seedling to a tree spirit, a grain of sand to a jade golem.
+  of your shell: stardust to the whole Universe, a seedling to the World tree, a grain of sand to a pet rock.
+
+Each Claude Code feature also brings a pet to collect, which grows the more you use that feature: an Owl for
+plan mode, an Ant for subagents, an Octopus for three at once, a Bee for skills, a Squirrel for `/compact`, a
+Turtle for memory files, a Spider for MCP tools, a Pigeon for resumed sessions. `/claudou swap` shows any of them.
 
 Also playing Bashou? `/claudou swap` can show the pets you unlocked there.
 

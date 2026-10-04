@@ -138,13 +138,14 @@ test('with Bashou installed, the pets unlocked there can be shown too', async ($
   expect(reads).toEqual(['/home/p/.local/share/bashou/state.json'])
   const list = await run($, 'pets')
   expect(list).toContain(t('fromBashou'))
-  expect(list).toContain('  6. Seedling')
+  expect(list).toContain('  6. Pygmy owl')                              // found with plan mode, before Bashou's
+  expect(list).toContain('  7. Seedling')
   for (const name of ['Sprout', 'Grass', 'Fennec', 'Fox', 'Droplet', 'Slime', 'Leaf slime']) expect(list).toContain(name)
   expect(list.includes('Kitsune')).toBe(false)                          // fox's next form: not reached in Bashou
   expect(await run($, 'swap fox')).toBe('Your pet is now a Fox.')
   expect(JSON.stringify(await (await band($)).drawn())).toContain(SPRITES.fox!.palette[Object.keys(SPRITES.fox!.palette)[0]!]!)
   expect(await run($, 'swap kitsune')).toBe('No form called "kitsune". /claudou pets lists them.')
-  expect(await run($, 'swap 6')).toBe('Your pet is now a Seedling.')
+  expect(await run($, 'swap 7')).toBe('Your pet is now a Seedling.')
 })
 
 test('Bashou\'s save is read where BASHOU_DATA says', async ($, on) => {

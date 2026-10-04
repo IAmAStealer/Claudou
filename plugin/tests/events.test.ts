@@ -2,6 +2,8 @@ import { expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 import type { Engine } from 'claude-code/testing'
 
+import { t } from '../hooks/messages'
+
 const DAY = 86_400_000
 const NOON = new Date(2026, 9, 3, 12).getTime()
 
@@ -60,9 +62,11 @@ test('three subagents in one turn make a crab team; two then one across turns do
   await start($)
   const agent = () => $.tool.call({ tool: 'Agent', description: 'd', prompt: 'p' })
   await agent(); await agent(); await endTurn($); await agent()
-  expect(toasts).toEqual(['Claudou: Delegator! Your pet grows.'])
+  expect(toasts.filter(x => x.includes('Your pet grows'))).toEqual(['Claudou: Delegator! Your pet grows.'])
   await agent(); await agent()
   expect(toasts).toContain('Claudou: Crab team! Your pet grows.')
+  for (let i = 0; i < 30; i++) await agent()                           // one crab team a turn, however many agents:
+  expect(toasts.filter(x => x.includes('Octopus'))).toEqual([])        // the Octopus needs 10 of them to grow
 })
 
 test('plan mode, skills, MCP tools and memory files count; other files and failed calls do not', async ($, on) => {
@@ -147,4 +151,19 @@ test('the crab planet tells the joke', async ($, on) => {
   const drawn = await pane($)
   expect(drawn).toContain('Crab planet')
   expect(drawn).toContain('Everything ends up a crab')
+})
+
+test('plan mode brings an owl: it joins at the first use, shows in /claudou pets, can be swapped, and grows at 10', async ($, on) => {
+  const { toasts } = world(on)
+  await start($)
+  expect(await claudou($, 'hint')).toContain(t('hintPet', 'en', { pet: 'Pygmy owl' }))
+  await $.tool.call({ tool: 'ExitPlanMode' })
+  expect(toasts).toContain(t('petJoined', 'en', { pet: 'Pygmy owl' }))
+  const list = await claudou($, 'pets')
+  expect(list).toContain(t('fromClaude', 'en', { n: 1, max: 8 }))
+  expect(list).toContain('  2. Pygmy owl')
+  expect(list).toContain(t('petsLeft', 'en', { n: 7 }))
+  expect(await claudou($, 'swap pygmy')).toBe('Your pet is now a Pygmy owl.')
+  for (let i = 1; i < 10; i++) await $.tool.call({ tool: 'ExitPlanMode' })
+  expect(toasts).toContain(t('petGrew', 'en', { pet: 'Barn owl' }))
 })

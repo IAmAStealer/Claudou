@@ -7,6 +7,26 @@ export const MESSAGES = {
     en: 'Your pet: the list of commands, or on, off, level, stats, achievements, hint, talk, pets, swap, evolve, share, layout, config, start, reset, version, help',
     fr: 'Ton compagnon : la liste des commandes, ou on, off, level, stats, achievements, hint, talk, pets, swap, evolve, share, layout, config, start, reset, version, help',
   },
+  petJoined: {
+    en: 'Claudou: a new pet joined you: {pet}! See /claudou pets',
+    fr: 'Claudou : un nouveau compagnon te rejoint : {pet} ! Vois /claudou pets',
+  },
+  hintPet: {
+    en: 'A new pet comes with it: {pet}.',
+    fr: 'Un nouveau compagnon vient avec : {pet}.',
+  },
+  petGrew: {
+    en: 'Claudou: your pet grew into a {pet}!',
+    fr: 'Claudou : ton compagnon est devenu {pet} !',
+  },
+  fromClaude: {
+    en: 'Found with Claude Code ({n}/{max}):',
+    fr: 'Trouvés avec Claude Code ({n}/{max}) :',
+  },
+  petsLeft: {
+    en: '  {n} more to find: each Claude Code feature brings one (/claudou hint)',
+    fr: '  encore {n} à trouver : chaque fonction de Claude Code en amène un (/claudou hint)',
+  },
   help: {
     en: [
       '/claudou (or help): this list',

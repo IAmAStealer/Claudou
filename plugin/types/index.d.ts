@@ -11,6 +11,7 @@ export type Progress = {
   prompts: number
   sessions: number
   features: Feature[]
+  uses: Partial<Record<Feature, number>>   // how many times each feature was used: its pet grows with it
 }
 
 declare module 'claude-code' {
