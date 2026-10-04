@@ -5,6 +5,7 @@ import type { Engine } from 'claude-code/testing'
 import { t } from '../hooks/messages'
 import { TICK_MS } from '../hooks/sprite'
 import { SPRITES } from '../hooks/sprites'
+import { LINES } from '../hooks/growth'
 
 // The world beneath the mod: a store, Bashou's save when given (else no such file), and the answers to the
 // mod's questions, by question (null: dismissed).
@@ -109,13 +110,23 @@ test('/claudou start dismissed keeps the pet', async ($, on) => {
   expect(await run($, 'start')).toBe('Your pet stays a Planet.')
 })
 
-test('a line with fewer forms drawn stops at its last one', async ($, on) => {
+for (const [line, last] of [['star', 'Universe'], ['sprout', 'World tree'], ['pebble', 'Pet rock']] as const) {
+  test(`the ${line} line has its 11 forms, the ${last} at level 25`, async ($, on) => {
+    expect(LINES[line]).toHaveLength(11)
+    world(on, { ...ALL, starter: line })
+    await start($)
+    expect(await run($, 'level')).toBe(`${last} · Level 25 of 25`)
+    expect(await run($, 'pets')).toContain(t('lastFormAny'))
+    expect(await run($, 'stats')).not.toContain(t('lastForm'))
+  })
+}
+
+test('in French, the last Pebble form is the Caillou chéri', { options: { language: 'fr' } }, async ($, on) => {
   world(on, { ...ALL, starter: 'pebble' })
   await start($)
-  expect(await run($, 'level')).toBe('Jade golem · Level 25 of 25')
-  expect(await run($, 'pets')).toContain(t('lastFormAny'))
-  expect(await run($, 'stats')).not.toContain(t('lastForm'))
+  expect(await run($, 'level')).toContain('Caillou chéri')
 })
+
 
 const SAVE = { starter: 'sprout', starter_best: 'grass', pets: ['fox', 'slime', 'nope'], ladder_best: { slime: 'leaf_slime' },
                looks: { fox: 'fox' } }

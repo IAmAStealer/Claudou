@@ -1,6 +1,54 @@
 {
  "_source": "Bashou (MIT), tools/import_bashou.py",
  "pets": {
+  "amethyst_golem": {
+   "name": {
+    "en": "Amethyst golem",
+    "fr": "Golem améthyste"
+   },
+   "palette": {
+    "a": "#3a3440",
+    "r": "#6a6470",
+    "R": "#9a94a0",
+    "v": "#4a2070",
+    "p": "#8a4ac0",
+    "P": "#c090f0",
+    "W": "#f4e8ff",
+    "m": "#1a0c24"
+   },
+   "base": [
+    "....aarrrrraa....",
+    "...aRRrrrrrRRa...",
+    ".arRavvvvvvvaRra.",
+    ".arvpPpvvvpPpvra.",
+    "arRvPWPpvpPWPvRra",
+    "arrvpmpPPPpmpvrra",
+    "arrvvpPPPPPpvvrra",
+    "arRvpPpvvvpPpvRra",
+    ".arrvvpPPPpvvrra.",
+    ".aarrvvvvvvvrraa.",
+    "..aarrrrrrrrraa..",
+    ".aaa..aaaaa..aaa."
+   ],
+   "poses": {
+    "inhale": {
+     "6": "----vpPWPWPpv----"
+    },
+    "closed": {
+     "5": "-----p-----p-----"
+    },
+    "left": {
+     "5": "----mp----mp-----"
+    },
+    "right": {
+     "5": "-----pm----pm----"
+    },
+    "fidget": {
+     "3": "-----W-----W-----",
+     "7": "------W---W------"
+    }
+   }
+  },
   "ant": {
    "name": {
     "en": "Worker ant",
@@ -487,6 +535,53 @@
     }
    }
   },
+  "black_hole": {
+   "name": {
+    "en": "Black hole",
+    "fr": "Trou noir"
+   },
+   "palette": {
+    "k": "#06060c",
+    "K": "#2a2a3e",
+    "r": "#9a3a10",
+    "o": "#f08020",
+    "y": "#ffd060",
+    "w": "#fff4c0",
+    "e": "#c8cdd0"
+   },
+   "base": [
+    "......rooor......",
+    "....royyyyyor....",
+    "...oyKKKKKKKyo...",
+    "..ryKkkkkkkkKyr..",
+    "..oKkkekkkekkKo..",
+    "..yKkkkkkkkkkKy..",
+    "rooyywwwwwwwyyoor",
+    "..ryyyyooooyyyr..",
+    "..oKkkkkkkkkkKo..",
+    "...oKKkkkkkKKo...",
+    "....roKKKKKor....",
+    "......rooor......"
+   ],
+   "poses": {
+    "inhale": {
+     "6": "royywwwwwwwwwyyor"
+    },
+    "closed": {
+     "4": "-------k---k-----"
+    },
+    "left": {
+     "4": "-----ek--ek------"
+    },
+    "right": {
+     "4": "------ke--ke-----"
+    },
+    "fidget": {
+     "6": "rooyywwywwywwyoor",
+     "0": "------roooo......"
+    }
+   }
+  },
   "blaze": {
    "name": {
     "en": "Blaze",
@@ -582,6 +677,53 @@
     },
     "fidget": {
      "9": "------------T----"
+    }
+   }
+  },
+  "blossom_tree": {
+   "name": {
+    "en": "Blossom tree",
+    "fr": "Cerisier fleuri"
+   },
+   "palette": {
+    "k": "#b04a78",
+    "P": "#f08cb8",
+    "p": "#ffc0dc",
+    "W": "#fff0f6",
+    "t": "#5a3a2a",
+    "T": "#7d5532",
+    "m": "#191919"
+   },
+   "base": [
+    "....kkkkkkkkk....",
+    "..kkPPpPPPPpPkk..",
+    ".kPPpWpPPPpWpPPk.",
+    "kPPPPpPPPPPPpPPPk",
+    "kPpPPPPPPpPPPPpPk",
+    ".kkPPkkPPPkkPPkk.",
+    "...kktTTTTTtkk...",
+    "..p..tTmTmTt...p.",
+    ".....tTTTTTt..p..",
+    ".p...tTTTTTt.....",
+    "....ttTTTTTtt....",
+    "...ttt..t..ttt..."
+   ],
+   "poses": {
+    "inhale": {
+     "0": "...kkkkkkkkkkk..."
+    },
+    "closed": {
+     "7": "-------T-T-------"
+    },
+    "left": {
+     "7": "------mTmT-------"
+    },
+    "right": {
+     "7": "-------TmTm------"
+    },
+    "fidget": {
+     "7": "....p-------.p...",
+     "9": "p....-------....."
     }
    }
   },
@@ -1342,6 +1484,53 @@
     }
    }
   },
+  "diamond_golem": {
+   "name": {
+    "en": "Diamond golem",
+    "fr": "Golem de diamant"
+   },
+   "palette": {
+    "k": "#3a5a7a",
+    "b": "#8ac8f0",
+    "B": "#c8ecff",
+    "w": "#ffffff",
+    "p": "#f0a0e0",
+    "y": "#fff080",
+    "m": "#2a3a4a"
+   },
+   "base": [
+    ".....kkkkkkk.....",
+    "....kBwBBBwBk....",
+    "...kBBbBBBbBBk...",
+    "..kbBbbBwBbbBbk..",
+    ".kkkkkkkkkkkkkkk.",
+    "..kbbbmBBBmbbbk..",
+    "...kbbBbBbBbbk...",
+    "y...kbbBwBbbk...p",
+    ".....kbBBBbk.....",
+    "......kbBbk......",
+    ".......kbk.......",
+    "........k........"
+   ],
+   "poses": {
+    "inhale": {
+     "3": "-------www-------"
+    },
+    "closed": {
+     "5": "------b---b------"
+    },
+    "left": {
+     "5": "-----mb--mb------"
+    },
+    "right": {
+     "5": "------bm--bm-----"
+    },
+    "fidget": {
+     "7": "p...------------y",
+     "1": "-----w-w--w-w----"
+    }
+   }
+  },
   "dragon": {
    "name": {
     "en": "Dragonet",
@@ -2009,6 +2198,53 @@
     }
    }
   },
+  "forest": {
+   "name": {
+    "en": "Forest",
+    "fr": "Forêt"
+   },
+   "palette": {
+    "d": "#1e4a2a",
+    "g": "#2f7a3a",
+    "G": "#5ab050",
+    "l": "#a0e070",
+    "t": "#6a4428",
+    "s": "#4a3a20",
+    "m": "#191919"
+   },
+   "base": [
+    "........l........",
+    ".......gGg.......",
+    "..l...gGlGg...l..",
+    ".gGg..gGGGg..gGg.",
+    ".gGg.gGmGmGg.gGg.",
+    "gGlGggGGGGGgggGlg",
+    "gGGGgGGlGGGGggGGg",
+    "dgGgdgGGGGGGgdgGd",
+    ".dgdgGGGGGlGGgdd.",
+    "..t.dddddddddd.t.",
+    "..t.....t.....t..",
+    "sssssssssssssssss"
+   ],
+   "poses": {
+    "inhale": {
+     "0": ".......lll......."
+    },
+    "closed": {
+     "4": "-------G-G-------"
+    },
+    "left": {
+     "4": "------mGmG-------"
+    },
+    "right": {
+     "4": "-------GmGm------"
+    },
+    "fidget": {
+     "2": "..G...-----...G..",
+     "3": ".glg..-----..glg."
+    }
+   }
+  },
   "fox": {
    "name": {
     "en": "Fox",
@@ -2110,6 +2346,55 @@
     },
     "right": {
      "2": "---wm------wm----"
+    }
+   }
+  },
+  "galaxy": {
+   "name": {
+    "en": "Galaxy",
+    "fr": "Galaxie"
+   },
+   "palette": {
+    "b": "#3a4aa0",
+    "B": "#6a80e0",
+    "c": "#b8d0ff",
+    "o": "#d89a40",
+    "y": "#ffe080",
+    "Y": "#fff6d0",
+    "m": "#3a2810",
+    "s": "#ffffff"
+   },
+   "base": [
+    ".......bBBBb.....",
+    "....bBBccBBbb..s.",
+    "..bBcb....bBBb...",
+    ".bBc..ooyoo..bB..",
+    ".Bc..oyYYYyo..Bb.",
+    "bB..oyYmYmYyo.cB.",
+    "Bc..oyyYYYyyo..B.",
+    ".Bb..oyyyyyo..cb.",
+    "..bB..ooooo..Bb..",
+    "s..bBBb....bcB...",
+    ".....bbBccBBb....",
+    "........bBBb....."
+   ],
+   "poses": {
+    "inhale": {
+     "4": "-----oyYsYyo-----"
+    },
+    "closed": {
+     "5": "-------Y-Y-------"
+    },
+    "left": {
+     "5": "------mYmYY------"
+    },
+    "right": {
+     "5": "------YYmYm------"
+    },
+    "fidget": {
+     "1": "---------------.s",
+     "9": ".s---------------",
+     "2": "----c------------"
     }
    }
   },
@@ -4047,6 +4332,56 @@
     }
    }
   },
+  "nebula": {
+   "name": {
+    "en": "Nebula",
+    "fr": "Nébuleuse"
+   },
+   "palette": {
+    "k": "#3a1850",
+    "p": "#7a3aa0",
+    "P": "#c058c0",
+    "q": "#ff9ad8",
+    "t": "#2c8aa0",
+    "T": "#7ae0e0",
+    "w": "#fff4d0",
+    "m": "#191919"
+   },
+   "base": [
+    ".....kkk...kkk...",
+    "...kkpPPk.kpPPk..",
+    "..kpPqqPPkPPqPpk.",
+    ".kpPqwqPPPPttTpk.",
+    ".kpPPqPPPPtTTtpk.",
+    "kpPPPPmPPPmTtPPpk",
+    "kpPPtPPPPPPPPPPpk",
+    ".kpttTPPqPPPPPpk.",
+    ".kpTTtPPPPPPwPpk.",
+    "..kptPPPPpPPPpk..",
+    "...kkpPPk.kppk...",
+    "....kkkk...kk...."
+   ],
+   "poses": {
+    "inhale": {
+     "0": "....kkkkk.kkkk...",
+     "11": "...kkkkkk.kkkk..."
+    },
+    "closed": {
+     "5": "------P---P------"
+    },
+    "left": {
+     "5": "-----mP--mP------"
+    },
+    "right": {
+     "5": "------Pm--Pm-----"
+    },
+    "fidget": {
+     "3": "-----q-----------",
+     "8": "------------P----",
+     "2": "------------w----"
+    }
+   }
+  },
   "octopito": {
    "name": {
     "en": "Octopito",
@@ -4142,6 +4477,56 @@
     "right": {
      "4": "----om----om-----",
      "5": "----om----om-----"
+    }
+   }
+  },
+  "old_oak": {
+   "name": {
+    "en": "Old oak",
+    "fr": "Vieux chêne"
+   },
+   "palette": {
+    "d": "#2f5f2a",
+    "L": "#4f8a3a",
+    "l": "#8cc060",
+    "a": "#b07a30",
+    "A": "#5a3a1a",
+    "n": "#3e2816",
+    "t": "#6a4428",
+    "T": "#94643a",
+    "m": "#191919"
+   },
+   "base": [
+    "...ddddd.ddddd...",
+    ".ddLLlLLdLLlLLdd.",
+    "dLLlLLLLLLLLlLLLd",
+    "dLLLALLlLLLLLALLd",
+    "dLLLaLLLLLLlLaLLd",
+    ".ddLLdLLLLLdLLdd.",
+    "...dddtTTTtddd...",
+    "....ntTmTmTtn....",
+    "....ntTTnTTtn....",
+    "...nttTTTTTttn...",
+    "..nntTTTTTTTtnn..",
+    ".nnn.nnn.nnn.nnn."
+   ],
+   "poses": {
+    "inhale": {
+     "0": "..ddddddddddddd.."
+    },
+    "closed": {
+     "7": "-------T-T-------"
+    },
+    "left": {
+     "7": "------mTmT-------"
+    },
+    "right": {
+     "7": "-------TmTm------"
+    },
+    "fidget": {
+     "3": "----L--------L---",
+     "4": "----A--------A---",
+     "10": "--nntTTTTTTTtnn.."
     }
    }
   },
@@ -4331,6 +4716,60 @@
     },
     "fidget": {
      "6": "---.----a--------"
+    }
+   }
+  },
+  "pet_rock": {
+   "name": {
+    "en": "Pet rock",
+    "fr": "Caillou chéri"
+   },
+   "palette": {
+    "k": "#2e2e36",
+    "d": "#56565f",
+    "r": "#84848e",
+    "R": "#aeaeb8",
+    "W": "#d6d6e0",
+    "e": "#f6f6f2",
+    "p": "#191919",
+    "n": "#7a5228",
+    "B": "#e8c088",
+    "b": "#c8995a",
+    "s": "#e8d070",
+    "S": "#b8983c"
+   },
+   "base": [
+    ".................",
+    ".....kkkkkkk.....",
+    "...kkWWRRrrrkk...",
+    "...kReeRReerdk...",
+    "..kRRpeRrperddk..",
+    "..krRRRrrrrdddk..",
+    ".skrrrrrrrrdddks.",
+    "nSskrrrrrrdddksSn",
+    "nBBBBBBBBBBBBBBBn",
+    "nbbbbbbbbbbbbbbbn",
+    "nbnbbbbbbbbbbbnbn",
+    "nnnnnnnnnnnnnnnnn"
+   ],
+   "poses": {
+    "inhale": {
+     "6": "s---------------s"
+    },
+    "closed": {
+     "3": "-----RR--rr------",
+     "4": "-----kk--kk------"
+    },
+    "left": {
+     "3": "-----pe--pe------",
+     "4": "-----ee--ee------"
+    },
+    "right": {
+     "4": "-----ep--ep------"
+    },
+    "fidget": {
+     "3": "-----ep--ep------",
+     "4": "-----ee--ee------"
     }
    }
   },
@@ -5111,6 +5550,56 @@
     },
     "fidget": {
      "8": "---b-y-----g-b---"
+    }
+   }
+  },
+  "ruby_golem": {
+   "name": {
+    "en": "Ruby golem",
+    "fr": "Golem de rubis"
+   },
+   "palette": {
+    "g": "#3a3a44",
+    "s": "#6a6a78",
+    "S": "#9a9aa8",
+    "G": "#b08020",
+    "Y": "#ffe080",
+    "k": "#600818",
+    "r": "#b01830",
+    "R": "#f04060",
+    "W": "#ffc0d0",
+    "m": "#1a0408"
+   },
+   "base": [
+    "....ssSSSSSss....",
+    "...sSSSSSSSSSs...",
+    ".gsSGYYYYYYYGSsg.",
+    "gssGYkrrrrrkYGssg",
+    "gSsGkrRWrrrrkGsSg",
+    "gSsGkrmrrrmrkGsSg",
+    "gssGkrrrrrrrkGssg",
+    ".gsGkrrRrrrrkGsg.",
+    ".gsGYkkrrrkkYGsg.",
+    "..gsGGYYYYYGGsg..",
+    "...gsssgggsssg...",
+    "..ggggg...ggggg.."
+   ],
+   "poses": {
+    "inhale": {
+     "4": "-----rRWWrrr-----"
+    },
+    "closed": {
+     "5": "------r---r------"
+    },
+    "left": {
+     "5": "-----mr--mr------"
+    },
+    "right": {
+     "5": "------rm--rm-----"
+    },
+    "fidget": {
+     "2": "-----YWYYYWY-----",
+     "7": "-------W---------"
     }
    }
   },
@@ -6921,6 +7410,59 @@
     }
    }
   },
+  "universe": {
+   "name": {
+    "en": "Universe",
+    "fr": "Univers"
+   },
+   "palette": {
+    "c": "#5a8ac0",
+    "C": "#d8ecff",
+    "K": "#2a2450",
+    "k": "#120f2c",
+    "p": "#c060e0",
+    "y": "#ffe080",
+    "b": "#6a80e0",
+    "B": "#b8d0ff",
+    "w": "#ffffff",
+    "e": "#d8dde0"
+   },
+   "base": [
+    ".....ccccccc.....",
+    "...ccCCKKKKKcc...",
+    "..cCKkkwkkkpKKc..",
+    ".cCKkbBkkkkppkKc.",
+    ".cKkkkkkykkkkkKc.",
+    "cKkkkkekkkekkbkKc",
+    "cKkkkkekkkekbBkKc",
+    "cKkpkkkkkkkkkkkKc",
+    ".cKkppkkkkkykkKc.",
+    ".cKKkkkbBkkkkKKc.",
+    "..ccKKkkkkKKKcc..",
+    "....ccccccccc...."
+   ],
+   "poses": {
+    "inhale": {
+     "1": "...ccCCCKKKKcc..."
+    },
+    "closed": {
+     "5": "------k---k------"
+    },
+    "left": {
+     "5": "-----ek--ek------",
+     "6": "-----ek--ek------"
+    },
+    "right": {
+     "5": "------ke--ke-----",
+     "6": "------ke--ke-----"
+    },
+    "fidget": {
+     "2": "-------k---------",
+     "4": "----w---k--------",
+     "7": "---------w---y---"
+    }
+   }
+  },
   "uplink": {
    "name": {
     "en": "Uplink",
@@ -7282,6 +7824,58 @@
     }
    }
   },
+  "world_tree": {
+   "name": {
+    "en": "World tree",
+    "fr": "Arbre-monde"
+   },
+   "palette": {
+    "d": "#2a5a28",
+    "L": "#4f8a3a",
+    "l": "#8cc060",
+    "y": "#ffe080",
+    "b": "#2a6ac0",
+    "B": "#7ab8f0",
+    "g": "#60b050",
+    "n": "#3e2816",
+    "t": "#6a4428",
+    "T": "#94643a",
+    "m": "#191919"
+   },
+   "base": [
+    "..dddd.bBb.dddd..",
+    ".dLLlLdbgBbdLlLd.",
+    "dLlLLLdBbbgdLLlLd",
+    "dLLyLLLdbbdLLyLLd",
+    ".dLLLLLLddLLLLLd.",
+    "..dddLLLLLLLddd..",
+    ".....tTTTTTt.....",
+    ".....tTmTmTt.....",
+    ".....tTTTTTt.....",
+    "....ntTTTTTtn....",
+    "..nnntTTTTTtnnn..",
+    "nnn..nn.n.nn..nnn"
+   ],
+   "poses": {
+    "inhale": {
+     "0": ".ddddd.bBb.ddddd."
+    },
+    "closed": {
+     "7": "-------T-T-------"
+    },
+    "left": {
+     "7": "------mTmT-------"
+    },
+    "right": {
+     "7": "-------TmTm------"
+    },
+    "fidget": {
+     "1": "-------bBgb------",
+     "2": "-------BbgB------",
+     "3": "---L---------L---"
+    }
+   }
+  },
   "xolotl": {
    "name": {
     "en": "Xolotl",
@@ -7358,7 +7952,11 @@
     "moon",
     "planet",
     "star",
-    "red_giant"
+    "red_giant",
+    "nebula",
+    "black_hole",
+    "galaxy",
+    "universe"
    ],
    "starter": true,
    "blurb": {
@@ -7386,7 +7984,11 @@
     "flower",
     "fern",
     "bush",
-    "tree"
+    "tree",
+    "old_oak",
+    "blossom_tree",
+    "forest",
+    "world_tree"
    ],
    "starter": true,
    "blurb": {
@@ -7402,7 +8004,11 @@
     "stone",
     "golem",
     "crystal",
-    "jade_golem"
+    "jade_golem",
+    "amethyst_golem",
+    "ruby_golem",
+    "diamond_golem",
+    "pet_rock"
    ],
    "starter": true,
    "blurb": {
