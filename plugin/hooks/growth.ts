@@ -2,6 +2,7 @@
 // Pure functions only: register.tsx feeds them the engine's events and stores the result.
 
 import type { Feature, Progress } from '../types'
+import { BASHOU_FAMILIES } from './bashou'
 
 export type { Feature, Progress }
 
@@ -36,21 +37,34 @@ export type Growth = (typeof GROWTH)[number]['id']
 export type Achievement = Feature | Growth
 export const ACHIEVEMENTS: readonly Achievement[] = [...FEATURES, ...GROWTH.map(g => g.id)]
 
-// The level each form starts at; the last one needs every achievement.
-export const FORMS = [
-  { id: 'crabling', level: 0 },
-  { id: 'peaCrab', level: 3 },
-  { id: 'hermitCrab', level: 5 },
-  { id: 'boxerCrab', level: 7 },
-  { id: 'fiddlerCrab', level: 9 },
-  { id: 'hornedGhostCrab', level: 11 },
-  { id: 'halloweenCrab', level: 13 },
-  { id: 'coconutCrab', level: 16 },
-  { id: 'tasmanianGiantCrab', level: 19 },
-  { id: 'japaneseSpiderCrab', level: 22 },
-  { id: 'crabPlanet', level: 25 },
+// The crab line: Claudou's own pixel art.
+export const CRAB = [
+  'crabling', 'peaCrab', 'hermitCrab', 'boxerCrab', 'fiddlerCrab', 'hornedGhostCrab', 'halloweenCrab', 'coconutCrab',
+  'tasmanianGiantCrab', 'japaneseSpiderCrab', 'crabPlanet',
 ] as const
-export type Form = (typeof FORMS)[number]['id']
+export type CrabForm = (typeof CRAB)[number]
+
+// The pets a player can start with: the crab, and Bashou's three starter lines (its pixel art, copied).
+export const STARTERS = ['crab', 'star', 'sprout', 'pebble'] as const
+export type Starter = (typeof STARTERS)[number]
+export const LINES: Record<Starter, readonly string[]> = {
+  crab: CRAB,
+  star: BASHOU_FAMILIES.star!.forms,
+  sprout: BASHOU_FAMILIES.sprout!.forms,
+  pebble: BASHOU_FAMILIES.pebble!.forms,
+}
+
+// The level each place of a line starts at, the same for every line; the 11th needs every achievement.
+// A line with fewer forms drawn stops at its last one until more are drawn.
+export const LEVELS = [0, 3, 5, 7, 9, 11, 13, 16, 19, 22, 25] as const
+
+export type Form = string
+
+export function forms(line: Starter): { id: Form; level: number }[] {
+  return LINES[line].map((id, i) => ({ id, level: LEVELS[i]! }))
+}
+
+export const isStarter = (x: unknown): x is Starter => STARTERS.includes(x as Starter)
 
 export function fresh(): Progress {
   return { days: 0, lastDay: '', streak: 0, bestStreak: 0, tokens: 0, prompts: 0, sessions: 0, features: [] }
@@ -123,13 +137,18 @@ export function level(p: Progress): number {
   return achieved(p).length
 }
 
-export function formAt(lvl: number): Form {
-  return [...FORMS].reverse().find(f => lvl >= f.level)!.id
+export function formAt(line: Starter, lvl: number): Form {
+  return [...forms(line)].reverse().find(f => lvl >= f.level)!.id
 }
 
-// The next form and the level it needs, or null once the crab is a planet.
-export function nextForm(lvl: number): { id: Form; level: number } | null {
-  return FORMS.find(f => f.level > lvl) ?? null
+// The forms of a line reached at a level, first to last.
+export function reached(line: Starter, lvl: number): Form[] {
+  return forms(line).filter(f => lvl >= f.level).map(f => f.id)
+}
+
+// The next form and the level it needs, or null at the line's last form.
+export function nextForm(line: Starter, lvl: number): { id: Form; level: number } | null {
+  return forms(line).find(f => f.level > lvl) ?? null
 }
 
 // What a change unlocked, in order: shown to the player once.

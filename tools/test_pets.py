@@ -11,7 +11,7 @@ GROWTH = Path(__file__).resolve().parent.parent / "plugin/hooks/growth.ts"
 
 class PetsTest(unittest.TestCase):
     def test_sprites_are_17_by_12_with_every_pose_and_known_colors(self):
-        files = sorted(PETS.glob("*.json"))
+        files = sorted(f for f in PETS.glob("*.json") if f.name != "bashou.json")
         self.assertTrue(files)
         for f in files:
             d = json.loads(f.read_text())
@@ -30,7 +30,8 @@ class PetsTest(unittest.TestCase):
                 self.assertNotEqual(lines, {}, f.name)
 
     def test_every_form_of_the_ladder_has_its_sprite(self):
-        forms = re.findall(r"\{ id: '(\w+)', level: \d+ \}", GROWTH.read_text())
+        crab = re.search(r"export const CRAB = \[(.*?)\] as const", GROWTH.read_text(), re.S).group(1)
+        forms = re.findall(r"'(\w+)'", crab)
         self.assertEqual(len(forms), 11)
         for form in forms:
             name = re.sub(r"(?<!^)([A-Z])", r"_\1", form).lower()          # peaCrab -> pea_crab
@@ -39,6 +40,17 @@ class PetsTest(unittest.TestCase):
     def test_the_mod_carries_the_sprites_as_they_are(self):
         import sprites_ts
         self.assertEqual(sprites_ts.OUT.read_text(), sprites_ts.source(), "run python3 tools/sprites_ts.py")
+        self.assertEqual(sprites_ts.BASHOU_OUT.read_text(), sprites_ts.bashou_source(), "run python3 tools/sprites_ts.py")
+
+    def test_bashou_pets_have_names_and_poses(self):
+        d = json.loads((PETS / "bashou.json").read_text())
+        self.assertGreater(len(d["pets"]), 100)
+        for pet_id, pet in d["pets"].items():
+            self.assertEqual(set(pet["name"]), {"en", "fr"}, pet_id)
+            self.assertEqual(len(pet["base"]), 12, pet_id)
+            self.assertTrue(all(len(r) == 17 for r in pet["base"]), pet_id)
+        for family in d["families"].values():
+            self.assertTrue(all(f in d["pets"] for f in family["forms"]))
 
 
 if __name__ == "__main__":

@@ -12,6 +12,9 @@ reaches the outside only through the engine's interface. It:
 - reads the events of your session (prompts, tool calls, finished turns) to grow your pet, and keeps only
   counters, never what you wrote or what Claude answered;
 - keeps those counters in Claude Code's store for mods, on your machine;
+- reads one file when it exists, [Bashou](https://github.com/IAmAStealer/Bashou)'s save
+  (`~/.local/share/bashou/state.json`, or `$BASHOU_DATA/state.json`), to know which Bashou pets you may show;
+  it never writes it;
 - sends nothing anywhere, and downloads nothing.
 
 It has no npm dependencies at all (a CI check refuses any), so nothing from a package registry runs with it.

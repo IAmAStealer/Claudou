@@ -11,7 +11,7 @@ import { VERSION } from '../hooks/version'
 // The world beneath the mod, and the answers a person gives to its questions (null: the dialog is dismissed).
 function world(on: On, stored: Record<string, unknown> = {}, answer: (options: string[]) => string | null = () => null) {
   const asked: string[][] = []
-  mock.store(on, { layout: 'horizontal', ...stored })
+  mock.store(on, { layout: 'horizontal', starter: 'crab', ...stored })
   const clock = mock.clock(on, { now: 0 })
   on('ui.toast', () => ({ value: undefined }))
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))
@@ -47,7 +47,7 @@ const ALL = { progress: { days: 100, bestStreak: 30, tokens: 100_000_000, prompt
 test('/claudou swap alone offers the newest four forms reached, and takes the one picked', async ($, on) => {
   const { asked } = world(on, LEVEL_9, options => options[2]!)
   await start($)
-  expect(await run($, 'swap')).toBe('Your crab is now a Hermit crab.')
+  expect(await run($, 'swap')).toBe('Your pet is now a Hermit crab.')
   expect(asked).toEqual([['Fiddler crab', 'Boxer crab', 'Hermit crab', 'Pea crab']])
   expect(await run($, 'pets')).toContain('▸ 3. Hermit crab')
 })
@@ -55,13 +55,13 @@ test('/claudou swap alone offers the newest four forms reached, and takes the on
 test('/claudou swap alone takes a number or name typed under Other', async ($, on) => {
   world(on, LEVEL_9, () => '1')
   await start($)
-  expect(await run($, 'swap')).toBe('Your crab is now a Crabling.')
+  expect(await run($, 'swap')).toBe('Your pet is now a Crabling.')
 })
 
 test('/claudou swap alone, dismissed, keeps the form', async ($, on) => {
   const { asked } = world(on, LEVEL_9)
   await start($)
-  expect(await run($, 'swap')).toBe('Your crab stays a Fiddler crab.')
+  expect(await run($, 'swap')).toBe('Your pet stays a Fiddler crab.')
   expect(asked.length).toBe(1)
 })
 
@@ -102,7 +102,7 @@ test('/claudou evolve walks the crab through every form it reached, one per tick
   const { clock } = world(on, LEVEL_9)
   await start($)
   const mounted = await band($)
-  expect(await run($, 'evolve')).toBe('Watch your crab grow: Crabling → Pea crab → Hermit crab → Boxer crab → Fiddler crab')
+  expect(await run($, 'evolve')).toBe('Watch your pet grow: Crabling → Pea crab → Hermit crab → Boxer crab → Fiddler crab')
   expect(JSON.stringify(await mounted.drawn())).toContain(SPRITES.crabling.palette.o!)
   await clock.advance(TICK_MS)
   expect(JSON.stringify(await mounted.drawn())).not.toContain(SPRITES.crabling.palette.o!)

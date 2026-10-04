@@ -8,7 +8,7 @@ import { SPRITES } from '../hooks/sprites'
 import { BUBBLE_MS, FIRST_TALK, TALK_EVERY } from '../hooks/register'
 
 function world(on: On, stored: Record<string, unknown> = {}) {
-  mock.store(on, { layout: 'horizontal', ...stored })
+  mock.store(on, { layout: 'horizontal', starter: 'crab', ...stored })
   const clock = mock.clock(on, { now: 0 })
   on('ui.toast', () => ({ value: undefined }))
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))
@@ -81,14 +81,14 @@ test('/claudou pets lists the forms reached; swap shows one of them, by number o
   expect(list).toContain('Forms reached (5/11):')
   expect(list).toContain('▸ 5. Fiddler crab')
   expect(list).toContain('  1. Crabling')
-  expect(await run($, 'swap 3')).toBe('Your crab is now a Hermit crab.')
+  expect(await run($, 'swap 3')).toBe('Your pet is now a Hermit crab.')
   expect(await run($, 'pets')).toContain('▸ 3. Hermit crab')
-  expect(await run($, 'swap boxer')).toBe('Your crab is now a Boxer crab.')
-  expect(await run($, 'swap crabe violoniste')).toBe('Your crab is now a Fiddler crab.')
+  expect(await run($, 'swap boxer')).toBe('Your pet is now a Boxer crab.')
+  expect(await run($, 'swap crabe violoniste')).toBe('Your pet is now a Fiddler crab.')
   expect(await run($, 'swap planet')).toBe('Crab planet comes at level 25. Keep using Claude Code to get there.')
   expect(await run($, 'swap lobster')).toBe('No form called "lobster". /claudou pets lists them.')
   await run($, 'swap 1')
-  expect(await run($, 'swap new')).toBe('Your crab shows its newest form: Fiddler crab.')
+  expect(await run($, 'swap new')).toBe('Your pet shows its newest form: Fiddler crab.')
 })
 
 test('the swapped form is drawn and kept for the next session', async ($, on) => {

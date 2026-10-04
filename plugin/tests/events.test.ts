@@ -7,7 +7,7 @@ const NOON = new Date(2026, 9, 3, 12).getTime()
 
 // The world beneath the mod: a store, a clock, tools that succeed (a skill named "broken" fails), toasts kept.
 function world(on: On, progress: Record<string, unknown> = {}) {
-  mock.store(on, { progress, layout: 'horizontal' })
+  mock.store(on, { progress, layout: 'horizontal', starter: 'crab' })
   const clock = mock.clock(on, { now: NOON })
   const toasts: string[] = []
   on('ui.toast', (_$, e) => { toasts.push(e.text); return { value: undefined } })
@@ -43,8 +43,8 @@ test('prompts on three days in a row unlock First day, 3 days and 3 days in a ro
     await $.prompt.submit({ text: 'hi', wait: false, origin: { kind: 'composer' } })
     await clock.advance(DAY)
   }
-  expect(toasts).toContain('Claudou: 3 days in a row! Your crab grows.')
-  expect(toasts).toContain('Claudou: your crab became a Pea crab!')
+  expect(toasts).toContain('Claudou: 3 days in a row! Your pet grows.')
+  expect(toasts).toContain('Claudou: your pet became a Pea crab!')
   expect(await pane($)).toContain('3 days · best streak 3 · 0 tokens · 3 prompts · 0 sessions')
 })
 
@@ -60,9 +60,9 @@ test('three subagents in one turn make a crab team; two then one across turns do
   await start($)
   const agent = () => $.tool.call({ tool: 'Agent', description: 'd', prompt: 'p' })
   await agent(); await agent(); await endTurn($); await agent()
-  expect(toasts).toEqual(['Claudou: Delegator! Your crab grows.'])
+  expect(toasts).toEqual(['Claudou: Delegator! Your pet grows.'])
   await agent(); await agent()
-  expect(toasts).toContain('Claudou: Crab team! Your crab grows.')
+  expect(toasts).toContain('Claudou: Crab team! Your pet grows.')
 })
 
 test('plan mode, skills, MCP tools and memory files count; other files and failed calls do not', async ($, on) => {
@@ -77,7 +77,7 @@ test('plan mode, skills, MCP tools and memory files count; other files and faile
   await $.tool.call({ tool: 'Edit', file_path: '/r/CLAUDE.md', old_string: 'a', new_string: 'b' })
   const names = toasts.filter(x => x.endsWith('grows.'))
   expect(names).toEqual(['Planner', 'Skilled claw', 'Plugged in', 'Shell memory']
-    .map(n => `Claudou: ${n}! Your crab grows.`))
+    .map(n => `Claudou: ${n}! Your pet grows.`))
 })
 
 test('/compact counts, an automatic compaction does not', async ($, on) => {
@@ -86,7 +86,7 @@ test('/compact counts, an automatic compaction does not', async ($, on) => {
   await $.session.compact({ trigger: 'auto', messages: [{ role: 'user', text: 'hi', toolUses: [] }] })
   expect(toasts).toEqual([])
   await $.session.compact({ trigger: 'manual', messages: [{ role: 'user', text: 'hi', toolUses: [] }] })
-  expect(toasts[0]).toBe('Claudou: Tidy tide! Your crab grows.')
+  expect(toasts[0]).toBe('Claudou: Tidy tide! Your pet grows.')
 })
 
 test('new and resumed sessions count; a resume is Back to the burrow; /clear is not a session', async ($, on) => {
@@ -96,7 +96,7 @@ test('new and resumed sessions count; a resume is Back to the burrow; /clear is 
   await $.classic.SessionStart({ source: 'clear' })
   expect(toasts).toEqual([])
   await $.classic.SessionStart({ source: 'resume' })
-  expect(toasts[0]).toBe('Claudou: Back to the burrow! Your crab grows.')
+  expect(toasts[0]).toBe('Claudou: Back to the burrow! Your pet grows.')
   expect(await pane($)).toContain('2 sessions')
 })
 
@@ -104,7 +104,7 @@ test('tokens add up input and output of every turn, cache left out', async ($, o
   const { toasts } = world(on, { tokens: 99_000 })
   await start($)
   await endTurn($, { input_tokens: 600, output_tokens: 400 })
-  expect(toasts[0]).toBe('Claudou: 100k tokens! Your crab grows.')
+  expect(toasts[0]).toBe('Claudou: 100k tokens! Your pet grows.')
   expect(await pane($)).toContain('100,000 tokens')
 })
 
@@ -113,7 +113,7 @@ test('a first day with a feature and 100k tokens evolves the crab once, not thre
   await $.prompt.submit({ text: 'hi', wait: false, origin: { kind: 'composer' } })
   await $.tool.call({ tool: 'ExitPlanMode' })
   await endTurn($, { input_tokens: 60_000, output_tokens: 40_000 })
-  expect(toasts.filter(t => t.includes('became'))).toEqual(['Claudou: your crab became a Pea crab!'])
+  expect(toasts.filter(t => t.includes('became'))).toEqual(['Claudou: your pet became a Pea crab!'])
 })
 
 test('/claudou stats shows the form, the level, the next form and the achievements', async ($, on) => {

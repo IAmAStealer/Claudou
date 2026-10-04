@@ -2,7 +2,9 @@ import { expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 import type { Engine } from 'claude-code/testing'
 
-import { FORMS } from '../hooks/growth'
+import { BASHOU_FAMILIES, BASHOU_NAMES } from '../hooks/bashou'
+import { LINES, STARTERS } from '../hooks/growth'
+import { LANGUAGES } from '../hooks/messages'
 import { frame, lines, poseAt, SEQUENCE, TICK_MS } from '../hooks/sprite'
 import type { Sprite } from '../hooks/sprite'
 import { SPRITES } from '../hooks/sprites'
@@ -28,18 +30,24 @@ test('a pose paints over the base, "-" keeps the pixel, an unknown pose is the b
   expect(TINY.base).toEqual(['ab.', 'a.b'])                        // the sprite itself is left alone
 })
 
-test('every form has a 17x12 sprite whose letters are all in its palette', () => {
-  for (const { id } of FORMS) {
-    const sprite = SPRITES[id]
+test('every sprite is 17x12, its letters all in its palette: every form of every line, every Bashou pet', () => {
+  const ids = new Set([...STARTERS.flatMap(s => LINES[s]), ...Object.values(BASHOU_FAMILIES).flatMap(f => f.forms)])
+  expect(ids.size > 100).toBe(true)
+  for (const id of ids) {
+    const sprite = SPRITES[id]!
     for (const pose of ['base', ...SEQUENCE]) {
       const rows = frame(sprite, pose)
       expect(rows.length).toBe(12)
-      for (const row of rows) {
-        expect(row.length).toBe(17)
-        for (const ch of row) expect(ch === '.' || ch in sprite.palette).toBe(true)
-      }
+      expect(rows.every(row => row.length === 17)).toBe(true)
+      expect(rows.join('').split('').filter(ch => ch !== '.' && !(ch in sprite.palette))).toEqual([])
     }
     expect(lines(sprite, 'base').length).toBe(6)
+  }
+})
+
+test('every Bashou pet has its name in every language', () => {
+  for (const family of Object.values(BASHOU_FAMILIES)) {
+    for (const id of family.forms) for (const l of LANGUAGES) expect((BASHOU_NAMES[id]?.[l] ?? '').length > 0).toBe(true)
   }
 })
 
@@ -50,7 +58,7 @@ test('the poses go round', () => {
 })
 
 function world(on: On, progress: Record<string, unknown> = {}) {
-  mock.store(on, { progress, layout: 'horizontal' })
+  mock.store(on, { progress, layout: 'horizontal', starter: 'crab' })
   const clock = mock.clock(on, { now: 0 })
   on('ui.toast', () => ({ value: undefined }))
   on('session.start', async (_$, e) => ({ cwd: e.cwd }))

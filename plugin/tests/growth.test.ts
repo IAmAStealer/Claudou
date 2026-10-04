@@ -12,16 +12,33 @@ test('25 achievements: the 8 features and 17 growth goals the owner approved', (
     [1, 3, 7, 30, 100, 3, 7, 30, 100_000, 1_000_000, 10_000_000, 100_000_000, 10, 100, 1000, 10, 100])
 })
 
-test('each form starts at its level, and the crab planet needs every achievement', () => {
-  const at = [0, 3, 5, 7, 9, 11, 13, 16, 19, 22, 25]
-  expect(growth.FORMS.map(f => f.level)).toEqual(at)
-  for (const [i, form] of growth.FORMS.entries()) {
-    expect(growth.formAt(form.level)).toBe(form.id)
-    if (i > 0) expect(growth.formAt(form.level - 1)).toBe(growth.FORMS[i - 1].id)
+test('each form starts at its level, on every line, and the crab planet needs every achievement', () => {
+  expect(growth.LEVELS).toEqual([0, 3, 5, 7, 9, 11, 13, 16, 19, 22, 25])
+  for (const line of growth.STARTERS) {
+    const forms = growth.forms(line)
+    expect(forms.length >= 7 && forms.length <= growth.LEVELS.length).toBe(true)
+    for (const [i, form] of forms.entries()) {
+      expect(form.level).toBe(growth.LEVELS[i]!)
+      expect(growth.formAt(line, form.level)).toBe(form.id)
+      if (i > 0) expect(growth.formAt(line, form.level - 1)).toBe(forms[i - 1]!.id)
+    }
+    expect(growth.formAt(line, 25)).toBe(forms[forms.length - 1]!.id)
+    expect(growth.nextForm(line, 25)).toBe(null)
   }
-  expect(growth.FORMS[growth.FORMS.length - 1].level).toBe(growth.ACHIEVEMENTS.length)
-  expect(growth.nextForm(4)).toEqual({ id: 'hermitCrab', level: 5 })
-  expect(growth.nextForm(25)).toBe(null)
+  expect(growth.forms('crab').length).toBe(11)
+  expect(growth.forms('crab')[10]!.level).toBe(growth.ACHIEVEMENTS.length)
+  expect(growth.nextForm('crab', 4)).toEqual({ id: 'hermitCrab', level: 5 })
+  expect(growth.nextForm('star', 4)).toEqual({ id: 'comet', level: 5 })
+  expect(growth.reached('sprout', 5)).toEqual(['seedling', 'sprout', 'grass'])
+})
+
+test('the starters are the crab and Bashou\'s three starter lines', () => {
+  expect([...growth.STARTERS]).toEqual(['crab', 'star', 'sprout', 'pebble'])
+  expect(growth.LINES.star[0]).toBe('stardust')
+  expect(growth.LINES.sprout[0]).toBe('seedling')
+  expect(growth.LINES.pebble[0]).toBe('sand_grain')
+  expect(growth.isStarter('star')).toBe(true)
+  expect(growth.isStarter('fox')).toBe(false)
 })
 
 test('a day counts once, however many prompts', () => {
@@ -67,7 +84,7 @@ test('every achievement reached gives the crab planet', () => {
   let p: growth.Progress = { ...growth.fresh(), days: 100, bestStreak: 30, tokens: 1e8, prompts: 1000, sessions: 100 }
   for (const f of growth.FEATURES) p = growth.used(p, f)
   expect(growth.level(p)).toBe(25)
-  expect(growth.formAt(growth.level(p))).toBe('crabPlanet')
+  expect(growth.formAt('crab', growth.level(p))).toBe('crabPlanet')
 })
 
 test('a damaged or old store gives clean progress', () => {
