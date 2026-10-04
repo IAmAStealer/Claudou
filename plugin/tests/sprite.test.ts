@@ -56,7 +56,7 @@ test('the poses go round', () => {
   expect(poseAt(SEQUENCE.length + 2)).toBe(SEQUENCE[2])
   expect(new Set(SEQUENCE)).toEqual(new Set(['base', 'inhale', 'closed', 'left', 'right', 'fidget']))
   const moves = SEQUENCE.filter(p => p !== 'base').length
-  expect(SEQUENCE.length / moves).toBeGreaterThanOrEqual(5)        // one move every 6 s or so, not every 2 or 3
+  expect(SEQUENCE.length / moves).toBeGreaterThanOrEqual(8)        // one move every 10 s or so, not every 2 or 3
 })
 
 function world(on: On, progress: Record<string, unknown> = {}) {
