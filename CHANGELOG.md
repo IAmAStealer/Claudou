@@ -3,6 +3,16 @@
 Every release has a section here, written for players. CI refuses to tag a release without one
 (`python3 tools/changelog.py v1.2.3` prints the section it will publish).
 
+## v0.1.8 — 2026-10-05
+
+- `/claudou swap` shows every pet: with more than four, they come three at a time, and "More pets…" turns the
+  page.
+- Evolutions play as in Bashou: your pet turns white, flickers between its old and new shapes faster and faster,
+  then appears in its new colors with sparkles. It happens when your pet evolves, and in `/claudou evolve`.
+- Your pet is calmer: it moves about once every ten seconds instead of every two or three.
+- The Squab has a new look: no more horns, its wing lifts when it breathes, and its beak opens like the
+  duckling's.
+
 ## v0.1.7 — 2026-10-04
 
 - Pets to collect: each Claude Code feature brings one, and it grows the more you use that feature. An Owl for
@@ -11,6 +21,10 @@ Every release has a section here, written for players. CI refuses to tag a relea
 - Your pet reacts to what Claude does: a ✦ when tests pass, a ! when a command fails, a ♪ when a long turn ends,
   and it dozes (z z) when nothing has happened for five minutes.
 - `/claudou` alone now lists the commands; `/claudou on` and `/claudou off` show and hide your pet.
+- After `/clear` or a resumed conversation, your pet keeps its form, its level and its place. It no longer
+  falls back to the first crab, and `/claudou swap` offers all your pets again.
+- Claudou stands on its own: it no longer reads Bashou's save, so the pets unlocked in Bashou no longer show up
+  in `/claudou swap`. The star, sprout and pebble lines and the pets you collect stay.
 
 ## v0.1.6 — 2026-10-04
 
